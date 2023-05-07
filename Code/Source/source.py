@@ -1,11 +1,7 @@
-# Copyright (c) 2023 Name
+# Copyright (c) 2023 Chenye Yang
 
+import numpy as np
 import logging
-
-from PIL import Image
-import io
-
-
 
 # Create a logger in this module
 logger = logging.getLogger(__name__)
@@ -13,59 +9,35 @@ logger = logging.getLogger(__name__)
 
 class Source:
     """
-    Description of class and constructor here
-
-        @type  variable: src_type
-        @param variable: description
+    The data source
     """
-    def __init__(self, src_type, src_path):
-        self.src_type = src_type
-        self.src_path = src_path
 
-        self._read_data()
-
-        
-
-
-    def _read_data(self):
+    def read_file(self, src_path):
         """
-        Read the data to be transmited from a file with given path
+        Read the file as binary bits
+
+            @type  src_path: string
+            @param src_path: source file path, with extension
         """
-        match self.src_type:
-            case "hardcoded":
-                # Open the file in binary mode for reading ('rb')
-                with open(self.src_path, 'rb') as file:
-                    # Read the file contents into a bytes object
-                    self.data = file.read()
-
-            case "image":
-                # Open the image
-                img = Image.open(self.src_path)
-
-                # Convert the image to bytes
-                byte_stream = io.BytesIO()
-                img.save(byte_stream, format='JPEG')  # Change the format if needed (e.g., 'PNG')
-                byte_stream.seek(0)  # Reset the stream position to the beginning
-                self.data = byte_stream.read()
+        with open(src_path, 'rb') as file:
+            byte_array = bytearray(file.read())
+            self._data = np.unpackbits(np.frombuffer(byte_array, dtype=np.uint8))
 
 
-            case "audio":
-                pass
-
-
-    def func(self, variable):
+    def get_data(self):
         """
-        Description of function
+        Get the bits to be transmitted
 
-            @type  variable: type
-            @param variable: description
-
-            @rtype:   return typr
-            @return:  description
+            @rtype:   ndarray
+            @return:  data bits
         """
-        return variable
+        return self._data
     
 
 if __name__ == '__main__':
-    # test your function here
-    pass
+    # test
+    source = Source()
+    source.read_file("Resource/hardcoded.txt")
+    bits = source.get_data()
+    print(bits)
+    print(type(bits))

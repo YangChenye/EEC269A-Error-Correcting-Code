@@ -1,32 +1,40 @@
 # Copyright (c) 2023 Name
 
+import numpy as np
 import logging
 
 # Create a logger in this module
 logger = logging.getLogger(__name__)
 
 
-class Channel:
+class Encoder:
     """
-    Description of class and constructor here
+    Channel encoder
 
         @type  variable: type
         @param variable: description
     """
-    def __init__(self, variable):
-        pass
+    def __init__(self):
+        self.n, self.k = 7, 4
+        self.G = np.array([[1, 0, 0, 0, 1, 0, 1],
+                      [0, 1, 0, 0, 1, 1, 1],
+                      [0, 0, 1, 0, 1, 1, 0],
+                      [0, 0, 0, 1, 0, 1, 1]], dtype=int)
+        self.H = np.array([[1, 1, 1, 0, 1, 0, 0],
+                      [1, 1, 0, 1, 0, 1, 0],
+                      [1, 0, 1, 1, 0, 0, 1]], dtype=int)
 
-    def func(self, variable):
+    def encoder_hamming(self, bits):
         """
-        Description of function
+        Encode the binary bits data with (7,4) hamming encoder
 
-            @type  variable: type
-            @param variable: description
+            @type  bits: bits string
+            @param bits: data
 
             @rtype:   return typr
             @return:  description
         """
-        return variable
+        pass
     
 
 if __name__ == '__main__':

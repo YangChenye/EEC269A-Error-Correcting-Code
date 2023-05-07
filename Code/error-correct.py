@@ -18,18 +18,17 @@ logger = logging.getLogger(__name__)
 
 def error_correct():
     """
-        Description of function
-
-            @type  variable: type
-            @param variable: description
-
-            @rtype:   return typr
-            @return:  description
+    Source - Channel encoder - Channel - Channel decoder - Destination
     """
     data_src = source.Source()
-    data_chl = channel.Channel()
+    # data_chl = channel.Channel()
     data_dest = destination.Destination()
-    pass
+    
+    data_src.read_file("Resource/image.jpg")
+    bits = data_src.get_data()
+
+    data_dest.set_data(bits)
+    data_dest.write_file("Result/output.jpg")
 
 
 

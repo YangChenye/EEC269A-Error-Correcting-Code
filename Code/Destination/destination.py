@@ -1,5 +1,6 @@
-# Copyright (c) 2023 Name
+# Copyright (c) 2023 Chenye Yang
 
+import numpy as np
 import logging
 
 # Create a logger in this module
@@ -8,27 +9,34 @@ logger = logging.getLogger(__name__)
 
 class Destination:
     """
-    Description of class and constructor here
-
-        @type  variable: type
-        @param variable: description
+    The destination
     """
-    def __init__(self, variable):
-        pass
 
-    def func(self, variable):
+    def set_data(self, bits):
         """
-        Description of function
+        Record the received data
 
-            @type  variable: type
-            @param variable: description
-
-            @rtype:   return typr
-            @return:  description
+            @type  bits: ndarray
+            @param bits: data bits
         """
-        return variable
+        self._data = bits
+
+
+    def write_file(self, dest_path):
+        """
+        Write data to a file
+
+            @type  dest_path: string
+            @param dest_path: destination file path, with extension
+        """
+        byte_array = bytearray(np.packbits(self._data).tobytes())
+        with open(dest_path, 'wb') as file:
+            file.write(byte_array)
     
 
 if __name__ == '__main__':
-    # test your function here
-    pass
+    # test
+    bits = np.array([0, 1, 0, 0, 1, 0, 0, 0]) # H
+    destination = Destination()
+    destination.set_data(bits)
+    destination.write_file("output.txt")
