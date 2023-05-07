@@ -20,15 +20,25 @@ def error_correct():
     """
     Source - Channel encoder - Channel - Channel decoder - Destination
     """
-    data_src = source.Source()
-    # data_chl = channel.Channel()
-    data_dest = destination.Destination()
-    
-    data_src.read_file("Resource/image.jpg")
-    bits = data_src.get_data()
+    src = source.Source()
 
-    data_dest.set_data(bits)
-    data_dest.write_file("Result/output.jpg")
+    encoder = channel.Encoder()
+    chl = channel.Channel()
+    decoder = channel.Decoder()
+    
+    dest = destination.Destination()
+    
+    src.read_file("Resource/hardcoded.txt")
+    tx_msg = src.get_data()
+
+    tx_codeword = encoder.encoder_hamming(tx_msg)
+
+    rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
+
+    rx_msg = decoder.decoder_hamming(rx_codeword)
+
+    dest.set_data(rx_msg)
+    dest.write_file("Result/hamming-bsc-output.txt")
 
 
 
