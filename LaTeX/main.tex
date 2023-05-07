@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{multirow}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 % \usepackage{biblatex}
@@ -26,7 +28,33 @@
 
 \maketitle
 
-\section{Introduction}
+\section{Workload}
+
+
+\begin{center}
+    \begin{tabularx}{\textwidth}{ |X|X|X|X| } 
+    \hline
+    Function & Workload & Contributor \\
+    \hline
+    \multirow{3}{4em}{Source} & txt & Chenye \\ 
+    & png & name \\ 
+    & mp3 & name \\ 
+    \hline
+    \multirow{2}{4em}{Encoder} & $(7,4)$ Hamming & Chenye \\ 
+    & CRC & name \\ 
+    \hline
+    \multirow{2}{4em}{Channel} & BSC & name \\ 
+    & AWGN & Parisa \\ 
+    \hline
+    \multirow{2}{4em}{Decoder} & $(7,4)$ Hamming & Chenye \\ 
+    & CRC & name \\ 
+    \hline
+    \multirow{3}{4em}{Destination} & txt & Chenye \\ 
+    & png & name \\ 
+    & mp3 & name \\ 
+    \hline
+    \end{tabularx}
+\end{center}
 
 
 \end{document}
