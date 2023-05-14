@@ -2,6 +2,8 @@
 
 import numpy as np
 from PIL import Image
+from pydub import AudioSegment
+from scipy.io import wavfile
 import logging
 
 # Create a logger in this module
@@ -56,6 +58,69 @@ class Source:
         self._analogue_data = img_array
 
         return height, width, channels
+    
+
+    def read_wav(self, src_path):
+        """
+        Read the wav file, 
+        store the audio information as binary bits in _digital_data, 
+        store the audio information as ndarray in _analogue_data. 
+        Return the frame_rate, sample_width, channels of the audio.
+
+            @type  src_path: string
+            @param src_path: source file path, with extension
+
+            @rtype:   tuple
+            @return:  frame rate, sample width, channels
+        """
+        # Open the audio file
+        sample_rate, audio_array = wavfile.read(src_path)
+        shape = audio_array.shape
+
+        # Convert the audio_array to binary format and flatten the array
+        bits = np.unpackbits(audio_array.astype(np.uint8)).flatten()
+
+        # Store the binary bits
+        self._digital_data = bits
+        # Store the analogue data
+        self._analogue_data = audio_array
+
+        return shape, sample_rate
+    
+
+    # def read_mp3(self, src_path):
+    #     """
+    #     Read the mp3 file,
+    #     store the audio information as binary bits in _digital_data, 
+    #     store the audio information as ndarray in _analogue_data. 
+    #     Return the frame_rate, sample_width, channels of the audio.
+
+    #         @type  src_path: string
+    #         @param src_path: source file path, with extension
+
+    #         @rtype:   tuple
+    #         @return:  frame rate, sample width, channels
+    #     """
+    #     # Open the audio file
+    #     audio = AudioSegment.from_file(src_path, format="mp3")
+    #     frame_rate, sample_width, channels = audio.frame_rate, audio.sample_width, audio.channels
+
+    #     # Convert the audio to a NumPy array
+    #     audio_array = np.array(audio.get_array_of_samples())
+    #     # print(audio_array.dtype)
+
+    #     # Get the shape of the array: e.g. (2392270,)
+    #     # shape = audio_array.shape
+
+    #     # Convert the audio_array to binary format and flatten the array
+    #     bits = np.unpackbits(audio_array.astype(np.uint8))
+
+    #     # Store the binary bits
+    #     self._digital_data = bits
+    #     # Store the analogue data
+    #     self._analogue_data = audio_array
+
+    #     return frame_rate, sample_width, channels
 
 
 
@@ -83,12 +148,25 @@ if __name__ == '__main__':
     # test
     source = Source()
     source.read_txt("Resource/hardcoded.txt")
-    bits = source.get_digital_data()
-    print(bits)
-    print(type(bits))
+    text_bits = source.get_digital_data()
+    print(text_bits)
+    print(type(text_bits))
 
     source.read_png("Resource/image.png")
-    bits = source.get_digital_data()
-    print(bits[:16])
-    pixels = source.get_analogue_data()
-    print(pixels[0][0][:2])
+    image_bits = source.get_digital_data()
+    print(image_bits[:16])
+    image_pixels = source.get_analogue_data()
+    print(image_pixels[0][0][:2])
+
+    # frame_rate, sample_width, channels = source.read_mp3("Resource/file_example_MP3_1MG.mp3")
+    # print(frame_rate, sample_width, channels)
+    # audio_bits = source.get_digital_data()
+    # print(audio_bits[:16])
+    # audio_array = source.get_analogue_data()
+    # print(audio_array[:2])
+
+    source.read_wav("Resource/file_example_WAV_1MG.wav")
+    audio_bits = source.get_digital_data()
+    print(audio_bits[:16])
+    audio_array = source.get_analogue_data()
+    print(audio_array[:2])
