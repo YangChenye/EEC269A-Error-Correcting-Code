@@ -72,3 +72,13 @@ def buildMatrix(n, k, gen, parity):
 def findMatrix(n,k):
 	gen, parity = findGen(n,k)
 	return buildMatrix(n, k, gen, parity)
+
+def encode(data, gen):
+	if order(data)+1 > len(gen):
+		return None
+	result = 0
+	data = bitRev(data, len(gen)-1)
+	for row in gen:
+		result = result ^ ((data & 1)*row)
+		data = data >> 1
+	return result
