@@ -1,5 +1,7 @@
 # Toolbox for polynomials and CRC
 
+import numpy
+
 def order(p):
 	p = p >> 1
 	order = 0
@@ -43,12 +45,12 @@ def polyDiv(dividend, divisor, dividendOrder = None, divisorOrder = None):
 
 def findGen(n,k):
 	target = (1 << n) + 1
-	gen = (1 << (n-k)) + 1
+	gen = (1 << (n-k)) + 3
 	parity, rem = polyDiv(target, gen, n, n-k)
 	while rem:
 		gen += 2
 		if gen >= target:
-			return 0, 0
+			return None, None
 		parity, rem = polyDiv(target, gen, n, n-k)
 	print('generator =', f'{gen:b}')
 	print('parity    =', f'{parity:b}')
@@ -56,7 +58,7 @@ def findGen(n,k):
 
 def buildMatrix(n, k, gen, parity):
 	genMatrix = [gen]
-	print(f'{gen:0{n}b}')
+	# print(f'{gen:0{n}b}')
 	for i in range(k-1):
 		nextLine = genMatrix[i] << 1
 		if (nextLine >> (n-k))%2:
@@ -71,6 +73,8 @@ def buildMatrix(n, k, gen, parity):
 
 def findMatrix(n,k):
 	gen, parity = findGen(n,k)
+	if gen == None:
+		return None
 	return buildMatrix(n, k, gen, parity)
 
 def encode(data, gen):
