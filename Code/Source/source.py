@@ -2,8 +2,8 @@
 
 import numpy as np
 from PIL import Image
-from pydub import AudioSegment
-from scipy.io import wavfile
+import soundfile as sf
+# from scipy.io import wavfile
 import logging
 
 # Create a logger in this module
@@ -50,7 +50,7 @@ class Source:
         height, width, channels = img_array.shape
 
         # Convert the img_array to binary format and flatten the array
-        bits = np.unpackbits(img_array.astype(np.uint8)).flatten()
+        bits = np.unpackbits(img_array.astype(np.uint8))
 
         # Store the binary bits
         self._digital_data = bits
@@ -74,11 +74,12 @@ class Source:
             @return:  frame rate, sample width, channels
         """
         # Open the audio file
-        sample_rate, audio_array = wavfile.read(src_path)
+        # sample_rate, audio_array = wavfile.read(src_path)
+        audio_array, sample_rate = sf.read(src_path, dtype='int16')
         shape = audio_array.shape
 
         # Convert the audio_array to binary format and flatten the array
-        bits = np.unpackbits(audio_array.astype(np.uint8)).flatten()
+        bits = np.unpackbits(audio_array.astype(np.int16).view(np.uint8))
 
         # Store the binary bits
         self._digital_data = bits

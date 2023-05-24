@@ -118,6 +118,6 @@ def error_correct_wav():
 
 
 if __name__ == '__main__':
-    # error_correct_txt()
-    # error_correct_png()
+    error_correct_txt()
+    error_correct_png()
     error_correct_wav()

@@ -2,8 +2,8 @@
 
 import numpy as np
 from PIL import Image
-from pydub import AudioSegment
-from scipy.io import wavfile
+import soundfile as sf
+# from scipy.io import wavfile
 import logging
 
 # Create a logger in this module
@@ -113,7 +113,7 @@ class Destination:
         new_image.save(dest_path)
 
         # Convert the img_array to binary format and flatten the array
-        bits = np.unpackbits(self._analogue_data.astype(np.uint8)).flatten()
+        bits = np.unpackbits(self._analogue_data.astype(np.uint8))
 
         # Store the binary bits
         self._digital_data = bits
@@ -126,17 +126,18 @@ class Destination:
             @type  dest_path: string
             @param dest_path: destination file path, with extension
         """
-        # Convert the bit array to uint16 array
-        uint16_array = np.packbits(self._digital_data).astype(np.int16)
+        # Convert the bit array to int16 array
+        int16_array = np.packbits(self._digital_data).view(np.int16)
 
         # Reshape the array to a 2D array of samples (channels, samples)
-        audio_array = uint16_array.reshape(shape)
+        audio_array = int16_array.reshape(shape)
 
         # Store the analogue data
         self._analogue_data = audio_array
 
         # Write the array to a wav file
-        wavfile.write(dest_path, sample_rate, audio_array)
+        # wavfile.write(dest_path, sample_rate, audio_array)
+        sf.write(dest_path, audio_array, sample_rate)
 
     
     def write_wav_from_analogue(self, sample_rate, dest_path):
@@ -147,10 +148,11 @@ class Destination:
             @param dest_path: destination file path, with extension
         """
         # Write the array to a wav file
-        wavfile.write(dest_path, sample_rate, self._analogue_data)
+        # wavfile.write(dest_path, sample_rate, self._analogue_data)
+        sf.write(dest_path, self._analogue_data, sample_rate)
 
         # Convert the audio_array to binary format and flatten the array
-        bits = np.unpackbits(self._analogue_data.astype(np.uint8)).flatten()
+        bits = np.unpackbits(self._analogue_data.astype(np.int16).view(np.uint8))
 
         # Store the binary bits
         self._digital_data = bits
