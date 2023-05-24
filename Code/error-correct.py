@@ -27,6 +27,7 @@ def error_correct_txt():
 
     encoder = channel.Encoder()
     chl = channel.Channel()
+    corrector = channel.Error_Corrector()
     decoder = channel.Decoder()
     
     dest = destination.Destination()
@@ -38,10 +39,16 @@ def error_correct_txt():
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
+    # without error correction
     rx_msg = decoder.decoder_hamming(rx_codeword)
-
     dest.set_digital_data(rx_msg)
     dest.write_txt("Result/hamming-bsc-output.txt")
+
+    # with error correction
+    estimated_tx_codeword = corrector.corrector_hamming_syndrome(rx_codeword)
+    rx_msg = decoder.decoder_hamming(estimated_tx_codeword)
+    dest.set_digital_data(rx_msg)
+    dest.write_txt("Result/hamming-bsc-output-corrected.txt")
 
 
 def error_correct_png():
@@ -54,6 +61,7 @@ def error_correct_png():
 
     encoder = channel.Encoder()
     chl = channel.Channel()
+    corrector = channel.Error_Corrector()
     decoder = channel.Decoder()
     
     dest = destination.Destination()
@@ -65,10 +73,16 @@ def error_correct_png():
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
+    # without error correction
     rx_msg = decoder.decoder_hamming(rx_codeword)
-
     dest.set_digital_data(rx_msg)
     dest.write_png_from_digital("Result/hamming-bsc-output.png", height, width, channels)
+
+    # with error correction
+    estimated_tx_codeword = corrector.corrector_hamming_syndrome(rx_codeword)
+    rx_msg = decoder.decoder_hamming(estimated_tx_codeword)
+    dest.set_digital_data(rx_msg)
+    dest.write_png_from_digital("Result/hamming-bsc-output-corrected.png", height, width, channels)
 
 
 def error_correct_wav():
@@ -81,6 +95,7 @@ def error_correct_wav():
 
     encoder = channel.Encoder()
     chl = channel.Channel()
+    corrector = channel.Error_Corrector()
     decoder = channel.Decoder()
     
     dest = destination.Destination()
@@ -107,14 +122,24 @@ def error_correct_wav():
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
+    # without error correction
     rx_msg = decoder.decoder_hamming(rx_codeword)
 
     dest.set_digital_data(rx_msg)
-
     dest.write_wav_from_digital(shape, sample_rate, "Result/hamming-bsc-output.wav")
 
     plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/wav-time-domain-RX.png")
     plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/wav-frequency-domain-RX.png")
+
+    # with error correction
+    estimated_tx_codeword = corrector.corrector_hamming_syndrome(rx_codeword)
+    rx_msg = decoder.decoder_hamming(estimated_tx_codeword)
+
+    dest.set_digital_data(rx_msg)
+    dest.write_wav_from_digital(shape, sample_rate, "Result/hamming-bsc-output-corrected.wav")
+
+    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/wav-time-domain-RX-corrected.png")
+    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/wav-frequency-domain-RX-corrected.png")
 
 
 if __name__ == '__main__':
