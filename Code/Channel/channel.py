@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Name
+# Copyright (c) 2023 Chenye Yang
 
 import numpy as np
 import logging
