@@ -37,20 +37,24 @@
     \hline
     \textbf{Function} & \textbf{Workload} & \textbf{Contributor} \\
     \hline
-    Source & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
+    \multirow{3}{*}{Source} & Text string (TXT) & Chenye \\ 
+    & Image (PNG) & Chenye \\ 
+    & Audio (WAV) & Chenye \\ 
     \hline
-    \multirow{2}{*}{Encoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & Chenye \\ 
+    \multirow{2}{*}{Encoder} & $(7,4)$ Hamming & Chenye \\ 
     & CRC & name \\ 
     \hline
-    \multirow{1}{*}{Channel} & Binary Symmetric Channel (BSC) with adjustable error probability & Chenye \\ 
+    \multirow{1}{*}{Channel} & BSC & Chenye \\ 
     \hline
-    \multirow{2}{*}{Error Corrector} &  Syndrome Lookup Table for $(7,4)$ Hamming Code & Chenye \\ 
+    \multirow{2}{*}{Error Corrector} & $(7,4)$ Hamming with Syndrome Lookup Table & Chenye \\ 
     & CRC & name \\ 
     \hline
-    \multirow{2}{*}{Decoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & Chenye \\ 
+    \multirow{2}{*}{Decoder} & $(7,4)$ Hamming & Chenye \\ 
     & CRC & name \\ 
     \hline
-    Destination & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
+    \multirow{3}{*}{Destination} & Text string (TXT) & Chenye \\ 
+    & Image (PNG) & Chenye \\ 
+    & Audio (WAV) & Chenye \\ 
     \hline
     \end{tabulary}
 \end{center}
