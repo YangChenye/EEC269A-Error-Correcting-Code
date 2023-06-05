@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 
-# Work with (7, 4) cyclic code
-n = 7
-k = 4
+# Work with (3, 1) cyclic code
+n = 3
+k = 1
 
 # Create the generator matrix
 genMatrix_decimal = polyTools.findMatrix(n, k)
