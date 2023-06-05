@@ -1,6 +1,12 @@
+# Copyright (c) 2023 Pranav Kharche, Chenye Yang
 # Toolbox for polynomials and CRC
 
-import numpy
+import numpy as np
+import logging
+
+# Create a logger in this module
+logger = logging.getLogger(__name__)
+
 
 def order(p):
 	p = p >> 1
@@ -52,8 +58,8 @@ def findGen(n,k):
 		if gen >= target:
 			return None, None
 		parity, rem = polyDiv(target, gen, n, n-k)
-	print('generator =', f'{gen:b}')
-	print('parity    =', f'{parity:b}')
+	logger.debug('generator =', f'{gen:b}')
+	logger.debug('parity    =', f'{parity:b}')
 	return gen, parity
 
 def buildMatrix(n, k, gen, parity):
@@ -65,10 +71,10 @@ def buildMatrix(n, k, gen, parity):
 			nextLine = nextLine ^ gen
 		genMatrix.append(nextLine)
 		# print(f'{nextLine:0{n}b}')
-	print('Generator matrix')
+	logger.debug('Generator matrix')
 	for i in range(k):
 		genMatrix[i] = bitRev(genMatrix[i], n-1)
-		print(f'{genMatrix[i]:0{n}b}')
+		logger.debug(f'{genMatrix[i]:0{n}b}')
 	return genMatrix
 
 def findMatrix(n,k):
@@ -86,3 +92,25 @@ def encode(data, gen):
 		result = result ^ ((data & 1)*row)
 		data = data >> 1
 	return result
+
+
+def genMatrixDecmial2Ndarray(genMatrix_decimal, n):
+	"""
+	Convert the generator matrix in decimal form to numpy array form
+	
+		@type  genMatrix_decimal: list
+		@param genMatrix_decimal: generator matrix in decimal form
+
+		@type  n: int
+		@param n: number of bits in a codeword
+		
+		@rtype:   ndarray
+		@return:  generator matrix in numpy array form
+	"""
+	# Convert the generator matrix in decimal form to binary form
+	genMatrix_binary = [[int(bit) for bit in f'{num:0{n}b}'] for num in genMatrix_decimal]
+
+	# Convert the binary generator matrix to a numpy array
+	G = np.array(genMatrix_binary, dtype=np.uint8)
+
+	return G
