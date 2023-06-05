@@ -10,6 +10,64 @@
 \usepackage{multirow}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{hyperref}
+% color def
+\usepackage{color}
+\definecolor{darkred}{rgb}{0.6,0.0,0.0}
+\definecolor{darkgreen}{rgb}{0,0.50,0}
+\definecolor{lightblue}{rgb}{0.0,0.42,0.91}
+\definecolor{orange}{rgb}{0.99,0.48,0.13}
+\definecolor{grass}{rgb}{0.18,0.80,0.18}
+\definecolor{pink}{rgb}{0.97,0.15,0.45}
+
+% listings
+\usepackage{listings}
+
+% General Setting of listings
+\lstset{
+  aboveskip=1em,
+  breaklines=true,
+  abovecaptionskip=-6pt,
+  captionpos=b,
+  escapeinside={\%*}{*)},
+  frame=single,
+  numbers=left,
+  numbersep=15pt,
+  numberstyle=\tiny,
+}
+% 0. Basic Color Theme
+\lstdefinestyle{colored}{ %
+  basicstyle=\ttfamily,
+  backgroundcolor=\color{white},
+  commentstyle=\color{green}\itshape,
+  keywordstyle=\color{blue}\bfseries\itshape,
+  stringstyle=\color{red},
+}
+% 1. General Python Keywords List
+\lstdefinelanguage{PythonPlus}[]{Python}{
+  morekeywords=[1]{,as,assert,nonlocal,with,yield,self,True,False,None,} % Python builtin
+  morekeywords=[2]{,__init__,__add__,__mul__,__div__,__sub__,__call__,__getitem__,__setitem__,__eq__,__ne__,__nonzero__,__rmul__,__radd__,__repr__,__str__,__get__,__truediv__,__pow__,__name__,__future__,__all__,}, % magic methods
+  morekeywords=[3]{,object,type,isinstance,copy,deepcopy,zip,enumerate,reversed,list,set,len,dict,tuple,range,xrange,append,execfile,real,imag,reduce,str,repr,}, % common functions
+  morekeywords=[4]{,Exception,NameError,IndexError,SyntaxError,TypeError,ValueError,OverflowError,ZeroDivisionError,}, % errors
+  morekeywords=[5]{,ode,fsolve,sqrt,exp,sin,cos,arctan,arctan2,arccos,pi, array,norm,solve,dot,arange,isscalar,max,sum,flatten,shape,reshape,find,any,all,abs,plot,linspace,legend,quad,polyval,polyfit,hstack,concatenate,vstack,column_stack,empty,zeros,ones,rand,vander,grid,pcolor,eig,eigs,eigvals,svd,qr,tan,det,logspace,roll,min,mean,cumsum,cumprod,diff,vectorize,lstsq,cla,eye,xlabel,ylabel,squeeze,}, % numpy / math
+}
+% 2. New Language based on Python
+\lstdefinelanguage{PyBrIM}[]{PythonPlus}{
+  emph={d,E,a,Fc28,Fy,Fu,D,des,supplier,Material,Rectangle,PyElmt},
+}
+% 3. Extended theme
+\lstdefinestyle{colorEX}{
+  basicstyle=\ttfamily,
+  backgroundcolor=\color{white},
+  commentstyle=\color{darkgreen}\slshape,
+  keywordstyle=\color{blue}\bfseries\itshape,
+  keywordstyle=[2]\color{blue}\bfseries,
+  keywordstyle=[3]\color{grass},
+  keywordstyle=[4]\color{red},
+  keywordstyle=[5]\color{orange},
+  stringstyle=\color{darkred},
+  emphstyle=\color{pink}\underbar,
+}
 % \usepackage{biblatex}
 % \addbibresource{bibliography.bib} %Import the bibliography file
 % \usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
@@ -28,6 +86,22 @@
 
 \maketitle
 
+\tableofcontents
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
 \section{Workload}
 
 
@@ -58,6 +132,63 @@
     \hline
     \end{tabulary}
 \end{center}
+
+
+\section{Source \& Destination}
+\subsection{Source}
+
+\subsubsection{Text string}
+The very basic function of the information source is to read a hard-coded text file into a bit stream. 
+In the text file, the following string is stored in ASCII format:
+\begin{center}
+    Hello World!\\EEC269A Error Correcting Code Demo
+\end{center}
+Each character is represented by 8 bits. Then, after transformation, the bit stream is of size 376 bits: 
+\begin{center}
+    0 1 0 0 1 0 0 0 0 1 1 0 0 1 0 1 \dots
+\end{center}
+
+
+\subsubsection{Image}
+\footnote{The image file 'image.png' used in this project is photographed by \textit{Chenye Yang} at Joshua Tree National Park.}
+
+
+
+
+
+\subsubsection{Audio}
+\footnote{The audio file 'file\_example\_WAV\_1MG.wav' used in this project is downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}
+
+
+
+\subsubsection{Copyright}
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Destination}
+
+
+
+
+
+
+\section{Binary Symmetric Channel (BSC)}
+
+
+
+
+
+
+
+
 
 
 \section{(7,4) Systematic Linear Block (Hamming) Code}
@@ -337,6 +468,33 @@
 
 \subsection{LFSR Decoder}
 
+
+\newpage
+\section{Appendix: Python source code}
+\subsection{Source}
+\label{appendix:source}
+\lstinputlisting[language=Python]{../Code/Source/source.py}
+
+\subsection{Channel}
+\label{appendix:channel}
+\lstinputlisting[language=Python]{../Code/Channel/channel.py}
+
+\subsection{Destination}
+\label{appendix:destination}
+\lstinputlisting[language=Python]{../Code/Destination/destination.py}
+
+\subsection{Utilities}
+\label{appendix:utils}
+\lstinputlisting[language=Python]{../Code/Utils/plot_wav.py}
+\lstinputlisting[language=Python]{../Code/Utils/polyTools.py}
+
+\subsection{Linear code}
+\label{appendix:linear-code}
+\lstinputlisting[language=Python]{../Code/linear-code.py}
+
+\subsection{Cyclic code}
+\label{appendix:cyclic-code}
+\lstinputlisting[language=Python]{../Code/cyclic-code.py}
 
 
 \end{document}
