@@ -254,19 +254,20 @@ For example, the image file we are using has more than one image data (IDAT) chu
 
 Ideally, the entire image file should be read into a bit stream and transmitted through the channel. 
 However, if there are uncorrectable errors in the chunks other than the image data (IDAT), the received image will not be able to display.
-Therefore, we shall only work with the image data (IDAT) chunks for the purpose of visualization of a corrupted image.
+Therefore, we shall only work with the image data (IDAT) chunks for the purpose of visualization of a corrupted image. 
+Also, this trick will not affect the statistical analysis of the system. 
 
 The information source is able to only extract the color information from a PNG file and convert it into a bit stream to be passed through the channel. 
-This is done by using the Python library \textit{numpy}.
+This is done by using the Python library \textit{NumPy}.
 
-The library \textit{numpy} provides a method to only read out the color information of an image. The shape of the result array is typically \textit{(height, width, channels)}, where:
+The library \textit{NumPy} provides a method to only read out the color information of an image. The shape of the result array is typically \textit{(height, width, channels)}, where:
 \begin{enumerate}
     \item \textit{height} is the number of pixels in the vertical direction (i.e. the number of rows of pixels);
     \item \textit{width} is the number of pixels in the horizontal direction (i.e. the number of columns of pixels);
     \item \textit{channels} is the number of color channels per pixel. This value depends on what type of image it is: \begin{itemize}
         \item In an RGB image, the three channels correspond to Red, Green, and Blue, respectively. Each channel value usually ranges from 0 to 255, where 0 indicates none of that color is present and 255 indicates that color is fully present.
         \item In a grayscale image, there is typically only one channel. The value in this single channel indicates the level of gray, where 0 is black and 255 is white.
-        \item There are many other color spaces (HSV, LAB, etc.) that have different meanings for their channels.
+        \item There are many other color spaces that have different meanings for their channels.
     \end{itemize}
 \end{enumerate}
 The data type for each channel of each pixel is \textit{uint8}, which is an unsigned integer that takes 8 bits.
@@ -295,9 +296,39 @@ A WAV file is divided into several sections or chunks, shown in Figure~\ref{fig:
 
 \begin{figure}[htb]
     \centering
-    \includegraphics[width=0.75\textwidth]{canonical-wav-file-structure.jpg}
+    \includegraphics[width=0.7\textwidth]{canonical-wav-file-structure.jpg}
     \caption{Canonical WAV file structure}
     \label{fig:canonical-wav-structure}
+\end{figure}
+
+Similar to the image file, the information source is able to only extract the audio Data Chunk from a WAV file and convert it into a bit stream to be passed through the channel. 
+This trick ensures both the visualization of the results and the statistical analysis of the system. The extraction is done by using the Python library \textit{soundfile}.
+
+The library \textit{soundfile} provides a method to only read out the audio data from a WAV file. The result contains two parts:
+\begin{enumerate}
+    \item audio array: This is a \textit{NumPy} array that contains the audio data from the file. The shape of the array depends on the number of channels in the audio file. If the audio is mono, the array will be one-dimensional. If the audio is stereo, the array will be two-dimensional, with one sub-array for each channel. The values in the array represent the amplitude of the audio signal at each sample point, and are of the data type specified.
+    \item sample rate: This is an integer that represents the number of samples per second in the audio file, measured in Hertz (Hz). Common sample rates include 44100 Hz (standard for audio CDs), 48000 Hz (standard for video production and DVDs), and 96000 Hz (used in high-definition formats).
+\end{enumerate}
+Then, the \textit{int16} array is "viewed" as \textit{uint8} array by \textit{numpy.view()} and flattened into a bit stream by converting each sample into an 8-bits binary number and appending them together. 
+Note that the \textit{numpy.view()} operation simply reinterprets the binary data, and does not convert or scale the data, which originally could be negative or positive. 
+
+For example, as for our testing audio file\footnote{The audio file '\textit{file\_example\_WAV\_1MG.wav}' used in this project is free downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}, shown in Figure~\ref{fig:our-audio-time-domain} and Figure~\ref{fig:our-audio-frequency-domain}, 
+the shape of the result audio array is \textit{(268237, 2)} and the sample rate is 8000 Hz. It means that the 33.5-second audio file has 268237 samples per channel, and there are two channels (stereo). 
+Then, the array is flattened into a bit stream of 8,583,584 bits.
+
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=\textwidth]{../Result/wav-time-domain-TX.png}
+    \caption{Time domain waveform of our testing audio file}
+    \label{fig:our-audio-time-domain}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=\textwidth]{../Result/wav-frequency-domain-TX.png}
+    \caption{Frequency domain waveform of our testing audio file}
+    \label{fig:our-audio-frequency-domain}
 \end{figure}
 
 
@@ -306,29 +337,14 @@ A WAV file is divided into several sections or chunks, shown in Figure~\ref{fig:
 
 
 
-
-
-
-
-
-
-\footnote{The audio file '\textit{file\_example\_WAV\_1MG.wav}' used in this project is free downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \subsection{Destination}
+At the destination, the bit stream is re-construed into the original format, and stored. 
+It is inevitable that some metadata is lost when processed by the system, since they are not transmitted through the channel.
+For example, the re-constructed image file will not have the camera and lens information. 
+However, this is the trade-off for a better visualization, and will not affect the statistical analysis of the system.
+
+
+
 
 
 

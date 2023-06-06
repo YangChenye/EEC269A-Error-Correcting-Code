@@ -70,8 +70,8 @@ class Source:
             @type  src_path: string
             @param src_path: source file path, with extension
 
-            @rtype:   tuple
-            @return:  frame rate, sample width, channels
+            @rtype:   tuple, int
+            @return:  shape, sample_rate
         """
         # Open the audio file
         # sample_rate, audio_array = wavfile.read(src_path)
@@ -166,8 +166,10 @@ if __name__ == '__main__':
     # audio_array = source.get_analogue_data()
     # print(audio_array[:2])
 
-    source.read_wav("Resource/file_example_WAV_1MG.wav")
+    shape, sample_rate = source.read_wav("Resource/file_example_WAV_1MG.wav")
+    print(' ')
+    print(shape, sample_rate)
     audio_bits = source.get_digital_data()
     print(audio_bits[:16])
     audio_array = source.get_analogue_data()
-    print(audio_array[:2])
+    print(audio_array[0])
