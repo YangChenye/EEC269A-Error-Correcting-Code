@@ -44,7 +44,7 @@ def create_syndrome_table(H):
     # Create a table of all possible syndromes and their corresponding error vectors (syndrome look-up table)
     coset_leader = np.vstack((np.zeros(n, dtype=np.uint8), np.eye(n, dtype=np.uint8)))
     possible_syndromes = (coset_leader @ H.T) % 2
-    syndrome_table = {str(possible_syndromes[i]) : coset_leader[i] for i in range(n+1)}
+    syndrome_table = {tuple(possible_syndromes[i]) : coset_leader[i] for i in range(n+1)}
 
     return syndrome_table
 
@@ -63,14 +63,17 @@ class Linear_Code:
         self.H = np.array([[1, 0, 0, 1, 0, 1, 1],
                            [0, 1, 0, 1, 1, 1, 0],
                            [0, 0, 1, 0, 1, 1, 1]], dtype=np.uint8)
-        self.syndrome_table = {'[0 0 0]' : np.array([0, 0, 0, 0, 0, 0, 0]),
-                               '[1 0 0]' : np.array([1, 0, 0, 0, 0, 0, 0]),
-                               '[0 1 0]' : np.array([0, 1, 0, 0, 0, 0, 0]),
-                               '[0 0 1]' : np.array([0, 0, 1, 0, 0, 0, 0]),
-                               '[1 1 0]' : np.array([0, 0, 0, 1, 0, 0, 0]),
-                               '[0 1 1]' : np.array([0, 0, 0, 0, 1, 0, 0]),
-                               '[1 1 1]' : np.array([0, 0, 0, 0, 0, 1, 0]),
-                               '[1 0 1]' : np.array([0, 0, 0, 0, 0, 0, 1])}
+        self.syndrome_table = {
+            (0, 0, 0): np.array([0, 0, 0, 0, 0, 0, 0]),
+            (1, 0, 0): np.array([1, 0, 0, 0, 0, 0, 0]),
+            (0, 1, 0): np.array([0, 1, 0, 0, 0, 0, 0]),
+            (0, 0, 1): np.array([0, 0, 1, 0, 0, 0, 0]),
+            (1, 1, 0): np.array([0, 0, 0, 1, 0, 0, 0]),
+            (0, 1, 1): np.array([0, 0, 0, 0, 1, 0, 0]),
+            (1, 1, 1): np.array([0, 0, 0, 0, 0, 1, 0]),
+            (1, 0, 1): np.array([0, 0, 0, 0, 0, 0, 1]),
+            }
+
 
     def encoder_systematic(self, bits):
         """
@@ -82,12 +85,14 @@ class Linear_Code:
             @rtype:   ndarray
             @return:  TX codewords
         """
-        encoded_array = np.zeros((len(bits) // self.k * self.n), dtype=np.uint8)
+        # Reshape the bits array to have one row per message
+        messages = bits.reshape(-1, self.k)
 
-        for i in range(0, len(bits), self.k):
-            message = bits[i:i + self.k]
-            codeword = np.dot(message, self.G) % 2
-            encoded_array[i // self.k * self.n:(i // self.k + 1) * self.n] = codeword
+        # Perform the matrix multiplication operation in one go, and flatten the result to 1D array
+        encoded_array = np.dot(messages, self.G) % 2
+
+        # Flatten the array
+        encoded_array = encoded_array.flatten()
 
         return encoded_array
 
@@ -102,18 +107,19 @@ class Linear_Code:
             @rtype:   ndarray
             @return:  RX message
         """
-        decoded_array = np.zeros((len(encoded_array) // self.n * self.k), dtype=np.uint8)
+        # Reshape the array so each row is a codeword
+        reshaped_array = encoded_array.reshape(-1, self.n)
 
-        err_count = 0
+        # Compute the syndrome for each codeword
+        syndromes = np.dot(reshaped_array, self.H.T) % 2
 
-        for i in range(0, len(encoded_array), self.n):
-            received_codeword = encoded_array[i:i + self.n]
-            syndrome = np.dot(self.H, received_codeword) % 2
-            if np.any(syndrome):  # If there are errors, count and keep it
-                err_count += 1
-            decoded_array[i // self.n * self.k : (i // self.n + 1) * self.k] = received_codeword[self.n - self.k:self.n]
+        # Count the number of non-zero syndromes (errors)
+        err_count = np.count_nonzero(np.any(syndromes, axis=1))
 
-        logger.info(f"Error codeword rate: {err_count/(len(encoded_array)//self.n)}")
+        # Decode by taking the last self.k elements from each codeword
+        decoded_array = reshaped_array[:, self.n - self.k:self.n].flatten()
+
+        logger.info(f"Error codeword rate: {err_count / (len(encoded_array) // self.n)}")
 
         return decoded_array
 
@@ -129,13 +135,24 @@ class Linear_Code:
             @rtype:   ndarray
             @return:  estimated TX codewords
         """
-        corrected_array = received_array.copy()
+        # Reshape the received_array so each row is a codeword
+        reshaped_array = received_array.reshape(-1, self.n)
 
-        for i in range(0, len(received_array), self.n):
-            received_codeword = received_array[i:i + self.n]
-            syndrome = np.dot(self.H, received_codeword) % 2
+        # Compute the syndrome for each codeword
+        syndromes = np.dot(reshaped_array, self.H.T) % 2
+
+        # Copy reshaped_array to corrected_array for correction
+        corrected_array = reshaped_array.copy()
+
+        # Loop over the syndromes
+        for i, syndrome in enumerate(syndromes):
             if np.any(syndrome):
-                corrected_array[i:i + self.n] = (received_codeword + self.syndrome_table[str(syndrome)]) % 2
+                # Convert syndrome to tuple for lookup
+                tuple_syndrome = tuple(syndrome)
+                corrected_array[i] = (reshaped_array[i] + self.syndrome_table[tuple_syndrome]) % 2
+
+        # Flatten corrected_array to match the shape of the input received_array
+        corrected_array = corrected_array.flatten()
 
         return corrected_array
 
@@ -185,10 +202,15 @@ class Channel:
             @rtype:   ndarray
             @return:  RX codewords
         """
-        output_bits = np.copy(input_bits)
-        for i in range(len(output_bits)):
-            if np.random.random() < p:
-                output_bits[i] = 1 - output_bits[i]  # flip the bit
+        # Generate a uniform random array of the same shape as input_bits
+        random_numbers = np.random.rand(*input_bits.shape)
+        
+        # Identify where the random array is less than p
+        mask = random_numbers < p
+        
+        # Use this mask to flip the bits at those indices
+        output_bits = np.where(mask, 1 - input_bits, input_bits)
+
         return output_bits
 
 

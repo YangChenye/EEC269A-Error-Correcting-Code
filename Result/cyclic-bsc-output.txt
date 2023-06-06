@@ -1,2 +1,2 @@
-Hu,lo World!
-EEC269A Error Correctifg Code Demo
+@ello Wosld!
+EEC269A Error Correcting Code Demo

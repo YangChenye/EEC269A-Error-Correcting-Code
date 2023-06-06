@@ -1,2 +1,2 @@
-Hello Wopld!
-EEC269A Arror Correcting Kode Demo
+Hello World!
+EEC249A ErRoò Correcting Code Demo
