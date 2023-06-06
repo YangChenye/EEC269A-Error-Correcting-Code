@@ -184,33 +184,21 @@ In ASCII format, each character is represented by 8 bits, shown in Table~\ref{ta
 
 
 \subsubsection{Image}
-A PNG file is composed of an 8-byte signature header, followed by any number of chunks that contain control data / metadata / image data. 
+PNG (Portable Network Graphics) is a raster graphics file format that supports lossless data compression. 
+PNG supports a large number of colors (up to 16 million), as well as variable transparency, which makes it useful for images with varying degrees of transparency or opacity. 
+Additionally, because PNG is a lossless format, it preserves all the detail in the original image, which is not the case with lossy formats like JPEG. 
+It is used for the storage and display of images on the internet, and is also used in graphic design and editing applications due to its lossless compression.
+
+PNG files consist of a header followed by a series of data chunks, e.g.:
+\begin{enumerate}
+    \item Signature: The first eight bytes of a PNG file always contain the following decimal numbers: 137, 80, 78, 71, 13, 10, 26, 10. This signature indicates that the file is a PNG.
+    \item Header Chunk (IHDR): The first chunk after the signature is the IHDR chunk, which contains basic information about the image, such as width, height, bit depth, color type, compression method, filter method, and interlace method.
+    \item Palette Chunk (PLTE): This chunk is optional and only present for color type 3 (indexed color). It contains the color palette for the image.
+    \item Data Chunks (IDAT): These chunks contain the actual image data, which is formed by pixels. This data is compressed to reduce the size of the file.
+    \item End Chunk (IEND): This is the final chunk in a PNG file. It does not contain any data and its purpose is to indicate the end of the file.
+\end{enumerate}
 Each chunk contains three standard fields: 4-byte length, 4-byte type code, 4-byte CRC and various internal fields that depend on the chunk type, shown in Figure~\ref{fig:png-structure}. 
 For example, the image file we are using has more than one image data (IDAT) chunks, each of which contains a portion of the image, shown in Table~\ref{tab:our-png-structure}.
-
-Ideally, the entire image file should be read into a bit stream and transmitted through the channel. 
-However, if there are uncorrectable errors in the chunks other than the image data (IDAT), the received image will not be able to display.
-Therefore, we shall only work with the image data (IDAT) chunks for the purpose of visualization of a corrupted image.
-
-The information source is able to only extract the color information from a PNG file and convert it into a bit stream to be passed through the channel. 
-This is done by using the Python library \textit{numpy}.
-
-The library \textit{numpy} provides a method to only read out the color information of an image. The shape of the result array is typically \textit{(height, width, channels)}, where:
-\begin{enumerate}
-    \item \textit{height} is the number of pixels in the vertical direction (i.e. the number of rows of pixels);
-    \item \textit{width} is the number of pixels in the horizontal direction (i.e. the number of columns of pixels);
-    \item \textit{channels} is the number of color channels per pixel. This value depends on what type of image it is: \begin{itemize}
-        \item In an RGB image, the three channels correspond to Red, Green, and Blue, respectively. Each channel value usually ranges from 0 to 255, where 0 indicates none of that color is present and 255 indicates that color is fully present.
-        \item In a grayscale image, there is typically only one channel. The value in this single channel indicates the level of gray, where 0 is black and 255 is white.
-        \item There are many other color spaces (HSV, LAB, etc.) that have different meanings for their channels.
-    \end{itemize}
-\end{enumerate}
-The data type for each channel of each pixel is \textit{uint8}, which is an unsigned integer that takes 8 bits.
-Then, the array is flattened into a bit stream by converting each channel of each pixel into an 8-bits binary number and appending them together.
-
-For example, as for our testing image\footnote{The image file '\textit{image.png}' used in this project is photographed by \textit{Chenye Yang} at Joshua Tree National Park.}, shown in Figure~\ref{fig:our-image}, the shape of the result array is \textit{(1280, 854, 3)}, which means that the image has 1280 rows of pixels, 854 columns of pixels, and 3 color channels per pixel (RGB). 
-Then, the array is flattened into a bit stream of 26,234,880 bits.
-
 
 \begin{figure}[htb]
     \centering
@@ -228,7 +216,6 @@ Then, the array is flattened into a bit stream of 26,234,880 bits.
     \end{minipage}
     \hfill
 \end{figure}
-
 
 
 \begin{table}[htb]
@@ -265,10 +252,66 @@ Then, the array is flattened into a bit stream of 26,234,880 bits.
     \end{tabulary}
 \end{table}
 
+Ideally, the entire image file should be read into a bit stream and transmitted through the channel. 
+However, if there are uncorrectable errors in the chunks other than the image data (IDAT), the received image will not be able to display.
+Therefore, we shall only work with the image data (IDAT) chunks for the purpose of visualization of a corrupted image.
+
+The information source is able to only extract the color information from a PNG file and convert it into a bit stream to be passed through the channel. 
+This is done by using the Python library \textit{numpy}.
+
+The library \textit{numpy} provides a method to only read out the color information of an image. The shape of the result array is typically \textit{(height, width, channels)}, where:
+\begin{enumerate}
+    \item \textit{height} is the number of pixels in the vertical direction (i.e. the number of rows of pixels);
+    \item \textit{width} is the number of pixels in the horizontal direction (i.e. the number of columns of pixels);
+    \item \textit{channels} is the number of color channels per pixel. This value depends on what type of image it is: \begin{itemize}
+        \item In an RGB image, the three channels correspond to Red, Green, and Blue, respectively. Each channel value usually ranges from 0 to 255, where 0 indicates none of that color is present and 255 indicates that color is fully present.
+        \item In a grayscale image, there is typically only one channel. The value in this single channel indicates the level of gray, where 0 is black and 255 is white.
+        \item There are many other color spaces (HSV, LAB, etc.) that have different meanings for their channels.
+    \end{itemize}
+\end{enumerate}
+The data type for each channel of each pixel is \textit{uint8}, which is an unsigned integer that takes 8 bits.
+Then, the array is flattened into a bit stream by converting each channel of each pixel into an 8-bits binary number and appending them together.
+
+For example, as for our testing image\footnote{The image file '\textit{image.png}' used in this project is photographed by \textit{Chenye Yang} at Joshua Tree National Park.}, shown in Figure~\ref{fig:our-image}, the shape of the result array is \textit{(1280, 854, 3)}, which means that the image has 1280 rows of pixels, 854 columns of pixels, and 3 color channels per pixel (RGB). 
+Then, the array is flattened into a bit stream of 26,234,880 bits.
+
+
+
+
 
 
 
 \subsubsection{Audio}
+WAV (Waveform Audio File Format) is a digital audio standard for storing audio bitstream on PCs. 
+WAV is an application of the Resource Interchange File Format (RIFF) method for storing data in chunks, and it is primarily used on Windows systems. 
+WAV files are typically used for raw and uncompressed audio, though they can also contain compressed audio.
+A WAV file is divided into several sections or chunks, shown in Figure~\ref{fig:canonical-wav-structure}. Each chunk serves a different purpose and holds different types of data. The basic structure of a WAV file includes the following chunks:
+\begin{enumerate}
+    \item RIFF Chunk: The RIFF chunk is the first chunk in a WAV file and identifies the file as a WAV file. It includes a header with the "RIFF" identifier and an integer indicating the remaining length of the entire file.
+    \item Format Chunk: Also known as the "fmt " chunk (with a space after 'fmt'), this contains important information about the audio data. This includes the audio format (e.g., PCM), the number of channels (mono, stereo, etc.), the sample rate, the byte rate, the block alignment, and the bit depth (bits per sample).
+    \item Data Chunk: This is where the actual audio data is stored. The "data" header is followed by an integer representing the length of the data, and then by the raw audio data itself.
+\end{enumerate}
+
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.75\textwidth]{canonical-wav-file-structure.jpg}
+    \caption{Canonical WAV file structure}
+    \label{fig:canonical-wav-structure}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
 \footnote{The audio file '\textit{file\_example\_WAV\_1MG.wav}' used in this project is free downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}
 
 
