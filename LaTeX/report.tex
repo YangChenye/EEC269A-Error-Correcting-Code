@@ -104,8 +104,10 @@
 \newpage
 \section{Workload}
 
-
-\begin{center}
+\begin{table}[htb]
+    \centering
+    \caption{Workload}
+    \label{tab:workload}
     \renewcommand{\arraystretch}{1.5}
     \begin{tabulary}{\textwidth}{ |L|L|L| } 
     \hline
@@ -131,7 +133,8 @@
     & \textbf{Adjustable $(n,k)$} & Pranav \\ 
     \hline
     \end{tabulary}
-\end{center}
+\end{table}
+
 
 
 \section{Source \& Destination}
@@ -139,29 +142,138 @@
 
 \subsubsection{Text string}
 The very basic function of the information source is to read a hard-coded text file into a bit stream. 
-In the text file, the following string is stored in ASCII format:
+In our text file, the following string is stored in ASCII format:
 \begin{center}
     Hello World!\\EEC269A Error Correcting Code Demo
 \end{center}
-Each character is represented by 8 bits. Then, after transformation, the bit stream is of size 376 bits: 
+In ASCII format, each character is represented by 8 bits, shown in Table~\ref{tab:ascii}. Then, after transformation, the bit stream is of size 376 bits: 
 \begin{center}
     0 1 0 0 1 0 0 0 0 1 1 0 0 1 0 1 \dots
 \end{center}
 
+\begin{table}[ht]
+    \centering
+    \caption{ASCII Table example}
+    \label{tab:ascii}
+    \begin{tabulary}{\textwidth}{|L|L|L|L|}
+    \hline
+    Character & Hexadecimal & Decimal & Binary \\
+    \hline
+    \dots & \dots & \dots & \dots \\
+    \hline
+    A & 41 & 65 & 0 1 0 0 0 0 0 1 \\
+    \hline
+    B & 42 & 66 & 0 1 0 0 0 0 1 0 \\
+    \hline
+    C & 43 & 67 & 0 1 0 0 0 0 1 1 \\
+    \hline
+    D & 44 & 68 & 0 1 0 0 0 1 0 0 \\
+    \hline
+    E & 45 & 69 & 0 1 0 0 0 1 0 1 \\
+    \hline
+    F & 46 & 70 & 0 1 0 0 0 1 1 0 \\
+    \hline
+    G & 47 & 71 & 0 1 0 0 0 1 1 1 \\
+    \hline
+    H & 48 & 72 & 0 1 0 0 1 0 0 0 \\
+    \hline
+    \dots & \dots & \dots & \dots \\
+    \hline
+    \end{tabulary}
+\end{table}
+
 
 \subsubsection{Image}
-\footnote{The image file 'image.png' used in this project is photographed by \textit{Chenye Yang} at Joshua Tree National Park.}
+A PNG file is composed of an 8-byte signature header, followed by any number of chunks that contain control data / metadata / image data. 
+Each chunk contains three standard fields: 4-byte length, 4-byte type code, 4-byte CRC and various internal fields that depend on the chunk type, shown in Figure~\ref{fig:png-structure}. 
+For example, the image file we are using has more than one image data (IDAT) chunks, each of which contains a portion of the image, shown in Table~\ref{tab:our-png-structure}.
 
+Ideally, the entire image file should be read into a bit stream and transmitted through the channel. 
+However, if there are uncorrectable errors in the chunks other than the image data (IDAT), the received image will not be able to display.
+Therefore, we shall only work with the image data (IDAT) chunks for the purpose of visualization of a corrupted image.
+
+The information source is able to only extract the color information from a PNG file and convert it into a bit stream to be passed through the channel. 
+This is done by using the Python library \textit{numpy}.
+
+The library \textit{numpy} provides a method to only read out the color information of an image. The shape of the result array is typically \textit{(height, width, channels)}, where:
+\begin{enumerate}
+    \item \textit{height} is the number of pixels in the vertical direction (i.e. the number of rows of pixels);
+    \item \textit{width} is the number of pixels in the horizontal direction (i.e. the number of columns of pixels);
+    \item \textit{channels} is the number of color channels per pixel. This value depends on what type of image it is: \begin{itemize}
+        \item In an RGB image, the three channels correspond to Red, Green, and Blue, respectively. Each channel value usually ranges from 0 to 255, where 0 indicates none of that color is present and 255 indicates that color is fully present.
+        \item In a grayscale image, there is typically only one channel. The value in this single channel indicates the level of gray, where 0 is black and 255 is white.
+        \item There are many other color spaces (HSV, LAB, etc.) that have different meanings for their channels.
+    \end{itemize}
+\end{enumerate}
+The data type for each channel of each pixel is \textit{uint8}, which is an unsigned integer that takes 8 bits.
+Then, the array is flattened into a bit stream by converting each channel of each pixel into an 8-bits binary number and appending them together.
+
+For example, as for our testing image\footnote{The image file '\textit{image.png}' used in this project is photographed by \textit{Chenye Yang} at Joshua Tree National Park.}, shown in Figure~\ref{fig:our-image}, the shape of the result array is \textit{(1280, 854, 3)}, which means that the image has 1280 rows of pixels, 854 columns of pixels, and 3 color channels per pixel (RGB). 
+Then, the array is flattened into a bit stream of 26,234,880 bits.
+
+
+\begin{figure}[htb]
+    \centering
+    \hfill
+    \begin{minipage}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{png-file-format.png}
+        \caption{PNG file structure}
+    \label{fig:png-structure}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.36\textwidth}
+        \includegraphics[width=\textwidth]{../Resource/image.png}
+        \caption{Our testing PNG image}
+    \label{fig:our-image}
+    \end{minipage}
+    \hfill
+\end{figure}
+
+
+
+\begin{table}[htb]
+    \centering
+    \caption{Our PNG file structure}
+    \label{tab:our-png-structure}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabulary}{\textwidth}{ |L|L| } 
+    \hline
+    Start offset & Chunk outside \\
+    \hline
+    0 & Special: File signature; Length: 8 bytes \\
+    \hline
+    8 & Data length: 13 bytes; Type: IHDR; Name: Image header; CRC-32: CB3954EC \\
+    \hline
+    33 & Data length: 1 bytes; Type: sRGB; Name: Standard RGB color space; CRC-32: AECE1CE9 \\
+    \hline
+    46 & Data length: 976 bytes; Type: eXIf; Name: Exchangeable Image File (Exif) Profile; CRC-32: 47FCFA4D \\
+    \hline
+    1,034 & Data length: 9 bytes; Type: pHYs; Name: Physical pixel dimensions; CRC-32: 5024E7F8 \\
+    \hline
+    1,055 & Data length: 4 514 bytes; Type: iTXt; Name: International textual data; CRC-32: C9C76B16 \\
+    \hline
+    5,581 & Data length: 16 384 bytes; Type: IDAT; Name: Image data; CRC-32: 8462CABD \\
+    \hline
+    21,977 & Data length: 16 384 bytes; Type: IDAT; Name: Image data; CRC-32: 2C9D007C \\
+    \hline
+    \dots & \dots \\
+    \hline
+    1,727,161 & Data length: 12 170 bytes; Type: IDAT; Name: Image data; CRC-32: 68067F52 \\
+    \hline
+    1,739,343 & Data length: 0 bytes; Type: IEND; Name: Image trailer; CRC-32: AE426082 \\
+    \hline
+    \end{tabulary}
+\end{table}
 
 
 
 
 \subsubsection{Audio}
-\footnote{The audio file 'file\_example\_WAV\_1MG.wav' used in this project is downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}
+\footnote{The audio file '\textit{file\_example\_WAV\_1MG.wav}' used in this project is free downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}
 
 
 
-\subsubsection{Copyright}
+
 
 
 
@@ -179,8 +291,21 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 
 
 
+\section{Channel}
 
-\section{Binary Symmetric Channel (BSC)}
+\subsection{Binary Symmetric Channel (BSC)}
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Additive White Gaussian Noise (AWGN) Channel}
 
 
 
@@ -195,7 +320,10 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 \subsection{Syndrome Decoder}
 \subsubsection{Text string}
 
-\begin{center}
+\begin{table}[htb]
+    \centering
+    \caption{Text string encoded with Linear Hamming passed through BSC}
+    \label{tab:text-linear-bsc}
     \renewcommand{\arraystretch}{1.5}
     \begin{tabulary}{\textwidth}{ |L|L|L| } 
     \hline
@@ -204,14 +332,15 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
     Hello World! EEC269A Error Correcting Code Demo & Hello Wo\textcolor{red}{p}ld! EEC269A \textcolor{red}{A}rror Correcting \textcolor{red}{K}ode Demo & Hello World! EEC269A Error Correcting Code Demo \\
     \hline
     \end{tabulary}
-\end{center}
+\end{table}
+
 
 
 
 \subsubsection{Image}
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
@@ -238,7 +367,7 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
@@ -268,7 +397,7 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 \subsubsection{Audio}
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
@@ -295,7 +424,7 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
@@ -326,8 +455,10 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 \subsection{Syndrome Decoder}
 \subsubsection{Text string}
 
-
-\begin{center}
+\begin{table}[htb]
+    \centering
+    \caption{Text string encoded with Cyclic Hamming passed through BSC}
+    \label{tab:text-cyclic-bsc}
     \renewcommand{\arraystretch}{1.5}
     \begin{tabulary}{\textwidth}{ |L|L|L| } 
     \hline
@@ -336,14 +467,14 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
     Hello World! EEC269A Error Correcting Code Demo & H\textcolor{red}{u,}lo World! EEC269A Error Correcti\textcolor{red}{f}g Code Demo & Hello World! EEC269A Error Correcting Code Demo \\
     \hline
     \end{tabulary}
-\end{center}
+\end{table}
 
 
 
 \subsubsection{Image}
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
@@ -372,7 +503,7 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
@@ -407,7 +538,7 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
@@ -435,7 +566,7 @@ Each character is represented by 8 bits. Then, after transformation, the bit str
 
 
 
-\begin{figure}
+\begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
