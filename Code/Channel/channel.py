@@ -49,6 +49,38 @@ def create_syndrome_table(H):
     return syndrome_table
 
 
+def pad_bits(bits, k):
+    """
+    Pad the bits array with zeroes so its length is divisible by k.
+
+        @type  bits: ndarray
+        @param bits: TX message
+
+        @type  k: int
+        @param k: number of bits per codeword
+    
+    """
+    padded_bits = bits.copy()
+    remainder = len(bits) % k
+    if remainder != 0:
+        padding_length = k - remainder
+        padded_bits = np.pad(padded_bits, (0, padding_length), mode='constant')
+    return padded_bits
+
+
+def remove_padding(bits, padding_length):
+    """
+    Remove the padding from the array.
+    
+        @type  bits: ndarray
+        @param bits: RX message
+
+        @type  padding_length: int
+        @param padding_length: length of the original TX message
+    """
+    return bits[:-padding_length] if padding_length != 0 else bits
+
+
 
 class Linear_Code:
     """
@@ -64,14 +96,14 @@ class Linear_Code:
                            [0, 1, 0, 1, 1, 1, 0],
                            [0, 0, 1, 0, 1, 1, 1]], dtype=np.uint8)
         self.syndrome_table = {
-            (0, 0, 0): np.array([0, 0, 0, 0, 0, 0, 0]),
-            (1, 0, 0): np.array([1, 0, 0, 0, 0, 0, 0]),
-            (0, 1, 0): np.array([0, 1, 0, 0, 0, 0, 0]),
-            (0, 0, 1): np.array([0, 0, 1, 0, 0, 0, 0]),
-            (1, 1, 0): np.array([0, 0, 0, 1, 0, 0, 0]),
-            (0, 1, 1): np.array([0, 0, 0, 0, 1, 0, 0]),
-            (1, 1, 1): np.array([0, 0, 0, 0, 0, 1, 0]),
-            (1, 0, 1): np.array([0, 0, 0, 0, 0, 0, 1]),
+            (0, 0, 0): np.array([0, 0, 0, 0, 0, 0, 0], dtype=np.uint8),
+            (1, 0, 0): np.array([1, 0, 0, 0, 0, 0, 0], dtype=np.uint8),
+            (0, 1, 0): np.array([0, 1, 0, 0, 0, 0, 0], dtype=np.uint8),
+            (0, 0, 1): np.array([0, 0, 1, 0, 0, 0, 0], dtype=np.uint8),
+            (1, 1, 0): np.array([0, 0, 0, 1, 0, 0, 0], dtype=np.uint8),
+            (0, 1, 1): np.array([0, 0, 0, 0, 1, 0, 0], dtype=np.uint8),
+            (1, 1, 1): np.array([0, 0, 0, 0, 0, 1, 0], dtype=np.uint8),
+            (1, 0, 1): np.array([0, 0, 0, 0, 0, 0, 1], dtype=np.uint8),
             }
 
 
@@ -85,8 +117,11 @@ class Linear_Code:
             @rtype:   ndarray
             @return:  TX codewords
         """
+        # Pad the bits array with zeroes so its length is divisible by self.k
+        padded_bits = pad_bits(bits, self.k)
+
         # Reshape the bits array to have one row per message
-        messages = bits.reshape(-1, self.k)
+        messages = padded_bits.reshape(-1, self.k)
 
         # Perform the matrix multiplication operation in one go, and flatten the result to 1D array
         encoded_array = np.dot(messages, self.G) % 2
@@ -97,12 +132,15 @@ class Linear_Code:
         return encoded_array
 
 
-    def decoder_systematic(self, encoded_array):
+    def decoder_systematic(self, encoded_array, padding_length=0):
         """
         Systematic - Decode the received binary bits codeword with (7,4) Hamming decoder, return the received message
 
             @type  encoded_array: ndarray
             @param encoded_array: RX codewords
+
+            @type  padding_length: int
+            @param padding_length: length of the padding (default: 0, means no padding)
 
             @rtype:   ndarray
             @return:  RX message
@@ -120,6 +158,10 @@ class Linear_Code:
         decoded_array = reshaped_array[:, self.n - self.k:self.n].flatten()
 
         logger.info(f"Error codeword rate: {err_count / (len(encoded_array) // self.n)}")
+
+        # Remove the padding from the array
+        if padding_length != 0:
+            decoded_array = remove_padding(decoded_array, padding_length)
 
         return decoded_array
 
@@ -217,7 +259,9 @@ class Channel:
 
 if __name__ == '__main__':
     # test
-    tx_msg = np.array([0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1], dtype=np.uint8)
+    tx_msg = np.array([0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1], dtype=np.uint8)
+    n = 7
+    k = 4
     print("Original bits:", tx_msg)
 
     # Channel
@@ -239,5 +283,6 @@ if __name__ == '__main__':
     print("Estimated TX bits :", estimated_tx_codewords)
 
     # Decoding
-    rx_msg = linear_code.decoder_systematic(estimated_tx_codewords)
+    padding_length = k - (len(tx_msg) % k)
+    rx_msg = linear_code.decoder_systematic(estimated_tx_codewords, padding_length)
     print("Decoded bits :", rx_msg)

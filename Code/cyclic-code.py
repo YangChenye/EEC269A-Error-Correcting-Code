@@ -16,9 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 
-# Work with (3, 1) cyclic code
-n = 3
-k = 1
+# Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code
+(n, k) = (31, 26)
 
 # Create the generator matrix
 genMatrix_decimal = polyTools.findMatrix(n, k)
@@ -39,19 +38,20 @@ def cyclic_txt():
 
     src.read_txt("Resource/hardcoded.txt")
     tx_msg = src.get_digital_data()
+    padding_length = k - (len(tx_msg) % k)
 
     tx_codeword = cyclic_code.encoder_systematic(tx_msg)
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
     # without error correction
-    rx_msg = cyclic_code.decoder_systematic(rx_codeword)
+    rx_msg = cyclic_code.decoder_systematic(rx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
     dest.write_txt("Result/cyclic-bsc-output.txt")
 
     # with error correction
     estimated_tx_codeword = cyclic_code.corrector_syndrome(rx_codeword)
-    rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword)
+    rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
     dest.write_txt("Result/cyclic-bsc-output-syndrome-corrected.txt")
 
@@ -70,19 +70,20 @@ def cyclic_png():
 
     height, width, channels = src.read_png("Resource/image.png")
     tx_msg = src.get_digital_data()
+    padding_length = k - (len(tx_msg) % k)
 
     tx_codeword = cyclic_code.encoder_systematic(tx_msg)
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
     # without error correction
-    rx_msg = cyclic_code.decoder_systematic(rx_codeword)
+    rx_msg = cyclic_code.decoder_systematic(rx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
     dest.write_png_from_digital("Result/cyclic-bsc-output.png", height, width, channels)
 
     # with error correction
     estimated_tx_codeword = cyclic_code.corrector_syndrome(rx_codeword)
-    rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword)
+    rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
     dest.write_png_from_digital("Result/cyclic-bsc-output-syndrome-corrected.png", height, width, channels)
 
@@ -112,13 +113,14 @@ def cyclic_wav():
 
 
     tx_msg = src.get_digital_data()
+    padding_length = k - (len(tx_msg) % k)
 
     tx_codeword = cyclic_code.encoder_systematic(tx_msg)
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
     # without error correction
-    rx_msg = cyclic_code.decoder_systematic(rx_codeword)
+    rx_msg = cyclic_code.decoder_systematic(rx_codeword, padding_length)
 
     dest.set_digital_data(rx_msg)
     dest.write_wav_from_digital(shape, sample_rate, "Result/cyclic-bsc-output.wav")
@@ -128,7 +130,7 @@ def cyclic_wav():
 
     # with error correction
     estimated_tx_codeword = cyclic_code.corrector_syndrome(rx_codeword)
-    rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword)
+    rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword, padding_length)
 
     dest.set_digital_data(rx_msg)
     dest.write_wav_from_digital(shape, sample_rate, "Result/cyclic-bsc-output-syndrome-corrected.wav")

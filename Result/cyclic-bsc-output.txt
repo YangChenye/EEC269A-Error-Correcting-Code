@@ -1,2 +1,1 @@
-@ello Wosld!
-EEC269A Error Correcting Code Demo
+Hello World!*EEC269A Error Correcting Code"Femo
