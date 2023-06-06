@@ -118,19 +118,24 @@
     \multirow{2}{*}{Encoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & Chenye \\ 
     & $(n,k)$ Systematic Cyclic (Hamming) Code & Pranav, Chenye \\ 
     \hline
-    \multirow{1}{*}{Channel} & Binary Symmetric Channel (BSC), error probability $p$ adjustable & Chenye \\ 
+    \multirow{2}{*}{Channel} & Binary Symmetric Channel (BSC), error probability $p$ adjustable & Chenye \\ 
+    & AWGN & Parisa \\ 
     \hline
     \multirow{3}{*}{Error Corrector} &  Syndrome Lookup Table for $(7,4)$ Linear Code & Chenye \\ 
     & Syndrome Lookup Table for $(n,k)$ Cyclic Code & Chenye \\ 
-    & LFSR for $(n,k)$ Cyclic Code & \textcolor{red}{TODO} \\
+    & LFSR for $(n,k)$ Cyclic Code & Pranav \\
     \hline
     \multirow{2}{*}{Decoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & Chenye \\ 
     & $(n,k)$ Systematic Cyclic (Hamming) Code & Chenye \\ 
     \hline
     Destination & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
     \hline
-    \multirow{2}{*}{\textbf{Advanced}} & \textbf{Create generator matrix for $(n,k)$ cyclic code} & Pranav \\ 
-    & \textbf{Adjustable $(n,k)$} & Pranav \\ 
+    \multirow{2}{*}{\textbf{Advanced features}} & \textbf{Create generator matrix for $(n,k)$ cyclic code} & Pranav \\ 
+    & \textbf{Adjustable $(n,k)$} & Pranav \\
+    \hline
+    \textbf{Presentation} & Slides & Parisa \\ 
+    \hline
+    \textbf{Report} & Written by contributors & - \\
     \hline
     \end{tabulary}
 \end{table}
@@ -273,7 +278,7 @@ The library \textit{NumPy} provides a method to only read out the color informat
 The data type for each channel of each pixel is \textit{uint8}, which is an unsigned integer that takes 8 bits.
 Then, the array is flattened into a bit stream by converting each channel of each pixel into an 8-bits binary number and appending them together.
 
-For example, as for our testing image\footnote{The image file '\textit{image.png}' used in this project is photographed by \textit{Chenye Yang} at Joshua Tree National Park.}, shown in Figure~\ref{fig:our-image}, the shape of the result array is \textit{(1280, 854, 3)}, which means that the image has 1280 rows of pixels, 854 columns of pixels, and 3 color channels per pixel (RGB). 
+For example, as for our testing image\footnote{The image file used in this project is photographed by \textit{Chenye Yang}. The material is free from any copyright restrictions and can be used without any potential legal implications.}, shown in Figure~\ref{fig:our-image}, the shape of the result array is \textit{(1280, 854, 3)}, which means that the image has 1280 rows of pixels, 854 columns of pixels, and 3 color channels per pixel (RGB). 
 Then, the array is flattened into a bit stream of 26,234,880 bits.
 
 
@@ -312,7 +317,7 @@ The library \textit{soundfile} provides a method to only read out the audio data
 Then, the \textit{int16} array is "viewed" as \textit{uint8} array by \textit{numpy.view()} and flattened into a bit stream by converting each sample into an 8-bits binary number and appending them together. 
 Note that the \textit{numpy.view()} operation simply reinterprets the binary data, and does not convert or scale the data, which originally could be negative or positive. 
 
-For example, as for our testing audio file\footnote{The audio file '\textit{file\_example\_WAV\_1MG.wav}' used in this project is free downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}.}, shown in Figure~\ref{fig:our-audio-time-domain} and Figure~\ref{fig:our-audio-frequency-domain}, 
+For example, as for our testing audio file\footnote{The audio file used in this project is free downloaded from \href{https://file-examples.com/index.php/sample-audio-files/sample-wav-download/}{file-examples.com}. The material is free from any copyright restrictions and can be used without any potential legal implications.}, shown in Figure~\ref{fig:our-audio-time-domain} and Figure~\ref{fig:our-audio-frequency-domain}, 
 the shape of the result audio array is \textit{(268237, 2)} and the sample rate is 8000 Hz. It means that the 33.5-second audio file has 268237 samples per channel, and there are two channels (stereo). 
 Then, the array is flattened into a bit stream of 8,583,584 bits.
 
