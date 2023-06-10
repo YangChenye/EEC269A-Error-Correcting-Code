@@ -2,9 +2,9 @@
 
 import logging
 
-from Source import source
-from Channel import channel
-from Destination import destination
+import source
+import channel
+import destination
 from Utils import plot_wav
 
 

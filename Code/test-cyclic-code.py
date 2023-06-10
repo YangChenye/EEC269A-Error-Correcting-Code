@@ -1,6 +1,6 @@
 # Copyright (c) 2023 Chenye Yang
 
-from Channel import channel
+import channel
 from Utils import polyTools
 
 import numpy as np
