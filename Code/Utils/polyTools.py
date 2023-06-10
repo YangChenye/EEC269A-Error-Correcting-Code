@@ -128,21 +128,30 @@ def buildParityMatrix(n, k, genMatrix):
 def findMatrix(n,k, nECC = 1):
 	numErrors = 0
 	i = 0
-	while numErrors < nECC:
+	bestPoly = 0
+	bestGen = None
+	maxErrors = 0
+	while nECC == None or numErrors < nECC:
 		i += 1
 		genPoly = findGen(n,k,i)
 		if genPoly == None:
-			logger.debug('no viable matrix found')
-			return None
-		print(i)
-		print(genPoly)
+			genMatrix = None
+			break
 		genMatrix = buildGenMatrix(n, k, genPoly)
 		numErrors = correctableErrors(n, k, genMatrix)
-		print(genMatrix)
-		print(numErrors)
-	logger.debug('used polynomial %b', genPoly)
-	logger.debug('%d correctable errors', numErrors)	
-	return genMatrix
+		if numErrors > maxErrors:
+			bestGen = genMatrix 
+			maxErrors = numErrors 
+			bestPoly = genPoly
+	if (nECC == None and bestGen == None) or (nECC and genMatrix == None):
+		logger.debug('no viable matrix found')
+		# print('no viable matrix found')
+		return None
+	logger.debug('used polynomial %d', bestPoly)
+	logger.debug('%d correctable errors', maxErrors)	
+	# print('used polynomial', bestPoly)
+	# print(maxErrors,'correctable errors')	
+	return bestGen
 
 # encode a data word with the provided generator matrix
 def encode(data, genMatrix):
