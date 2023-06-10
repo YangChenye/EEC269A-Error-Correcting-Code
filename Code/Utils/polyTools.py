@@ -73,16 +73,19 @@ def polyDiv(dividend, divisor, dividendOrder = None, divisorOrder = None):
 # n, k: code length and information length of the code
 # findN: find the nth solution. function normally stops upon finding the first solution that matches n and k. However, this is not always optimal.
 # 		 Callers of this function may find that the 2nd or 3rd solution works better.
-def findGen(n,k, findN = 1):
+def findGen(n,k, initialGen = None):
 	target = (1 << n) + 1
-	gen = (1 << (n-k)) + 1
-	while findN or rem:
+	if initialGen:
+		gen = initialGen
+	else:
+		gen = (1 << (n-k)) + 1
+	maxGen = (1 << (n-k+1))
+	rem = 1
+	while rem:
 		gen += 2
-		if gen >= target:
+		if gen >= maxGen:
 			return None
 		parity, rem = polyDiv(target, gen, n, n-k)
-		if rem == 0:
-			findN -= 1
 	logger.debug('generator = %s', f'{gen:b}')
 	logger.debug('parity    = %s', f'{parity:b}')
 	return gen
@@ -113,7 +116,7 @@ def buildParityMatrix(n, k, genMatrix):
 	m = n-k
 	logger.debug('Parity Matrix Transpose')
 	for i in range(m-1, -1, -1):
-		Ht.append(2**i)
+		Ht.append(1 << i)
 		logger.debug(f'{(Ht[-1]):0{m}b}')
 	for row in genMatrix:
 		Ht.append(row >> k)
@@ -125,15 +128,15 @@ def buildParityMatrix(n, k, genMatrix):
 # returns None if requirements are impossible to meet.
 # n, k: code length and information length of the code
 # nECC: number of correctable errors the code must have
+# 		input of nECC = None means it will search for the best possible code.
 def findMatrix(n,k, nECC = 1):
 	numErrors = 0
-	i = 0
 	bestPoly = 0
+	genPoly = 0
 	bestGen = None
 	maxErrors = 0
 	while nECC == None or numErrors < nECC:
-		i += 1
-		genPoly = findGen(n,k,i)
+		genPoly = findGen(n,k,genPoly)
 		if genPoly == None:
 			genMatrix = None
 			break
@@ -167,15 +170,48 @@ def encode(data, genMatrix):
 # Find the number of errors that a specific code can fix.
 # This is based on the minimum distance between code words which
 # is eq to the minimum weight of the non-zero codewords
-def correctableErrors(n, k, genMatrix):
+def correctableErrors_old(n, k, genMatrix):
 	weightTable = [0] * (n+1)
 	minWeight = n
-	for i in range(1, 2**k, 1):
+	for i in range(1, 1<<k, 1):
 		wordWeight = weight(encode(i, genMatrix))
 		if wordWeight < minWeight:
 			minWeight = wordWeight
+			# print(minWeight)
 		weightTable[wordWeight] += 1
+	# print(weightTable)
 	return ((minWeight-1) // 2)
+
+
+def nCr_Seq(n, r):
+	if r > n:
+		return []
+	if r == 0:
+		return [0]
+	if n == r:
+		return [((1<<n) - 1)]
+
+	seq = []
+	for inc in nCr_Seq(n-1, r-1):
+		seq.append((inc<<1) + 1)
+	for exc in nCr_Seq(n-1, r):
+		seq.append(exc<<1)
+	return seq
+
+def correctableErrors(n, k, genMatrix):
+	minWeight = n
+	for minPossible in range(1, n-k+1, 1):
+		if minWeight <= minPossible:
+			break
+		# print(k, 'choose', minPossible)
+		for word in nCr_Seq(k, minPossible):
+			if minWeight <= minPossible:
+				break
+			wordWeight = weight(encode(word, genMatrix))
+			if wordWeight < minWeight:
+				minWeight = wordWeight
+				# print(minWeight, word)
+	return (minWeight-1) // 2
 
 def genMatrixDecmial2Ndarray(genMatrix_decimal, n):
 	"""
