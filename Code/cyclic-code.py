@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 # Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code
-(N, K) = (31, 26)
+N, K = 31, 26
 
 # Create the generator matrix
 genMatrix_decimal = polyTools.findMatrix(N, K)

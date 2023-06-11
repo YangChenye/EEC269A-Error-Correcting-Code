@@ -1,2 +1,2 @@
-Hello World!
-EEC26A Error Correcting Code Dem.
+Hello World#
+EEC269A ERror Correcting Code Demo
