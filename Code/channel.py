@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Chenye Yang
+# Copyright (c) 2023 Chenye Yang, Pranav Kharche
 
 import numpy as np
 import logging
@@ -170,7 +170,7 @@ class Linear_Code:
 
     def corrector_syndrome(self, received_array):
         """
-        Systematic - Correct the received binary bits codeword with (n,k) Hamming syndrome look-up table corrector, 
+        Systematic - Correct the received binary bits codeword (up to 1 error bit) with (n,k) Hamming syndrome look-up table corrector, 
         return the estimated TX codeword = (RX codeword + error pattern)
 
             @type  received_array: ndarray
@@ -204,38 +204,31 @@ class Linear_Code:
 
 class Cyclic_Code(Linear_Code):
     """
-    (n, k) Systematic Cyclic (Hamming) Code
+    (n, k) Systematic Cyclic Code
     """
-    # def __init__(self, G):
-    #     self.G = G
-    #     self.k, self.n = self.G.shape
-    #     self.H = create_parity_check_matrix(self.G)
-
-    #     self.syndrome_table = create_syndrome_table(self.H)
-
     def __init__(self, n, k, nECC = 1):
         self.n = n
         self.k = k
         self.G_dec = pt.findMatrix(self.n, self.k, nECC)
+        self.G = pt.genMatrixDecmial2Ndarray(self.G_dec, self.n)
+
+        # Following used in trapping corrector
         self.nECC = pt.correctableErrors(self.n, self.k, self.G_dec)
         self.HT_dec = pt.buildParityMatrix(self.n, self.k, self.G_dec)
-        
-        self.G = pt.genMatrixDecmial2Ndarray(self.G_dec, self.n)
         self.HT = pt.genMatrixDecmial2Ndarray(self.HT_dec, self.n-self.k)
 
-        print('generated a (',self.n,',', self.k, ') cyclic code', sep='')
-        print(self.nECC, 'correctable errors')
-        # print(self.G)
-        # print(self.HT)
+        # Following used in sydrome look-up table corrector (inherit from Linear_Code)
         self.H = create_parity_check_matrix(self.G)
-
         self.syndrome_table = create_syndrome_table(self.H)
-        # print(self.syndrome_table)
+
+        logger.info("Generated a (%d, %d) cyclic code", self.n, self.k)
+        logger.info("%d correctable errors", self.nECC)
+        logger.info("Generator matrix:\n%s", self.G)
 
 
     def corrector_trapping(self, received_array):
         """
-        Systematic - Correct the received binary bits codeword with (n, k) Error trapping corrector,
+        Systematic - Correct the received binary bits codeword (up to nECC error bits) with (n, k) Error trapping corrector,
         return the estimated TX codeword = (RX codeword + error pattern)
 
             @type  received_array: ndarray
@@ -261,7 +254,7 @@ class Cyclic_Code(Linear_Code):
                     break
                 received_word = np.roll(received_word, -1)
                 if i == self.n-1:
-                    print('Uncorrectable Error')
+                    logger.debug('Uncorrectable Error')
                     corrected_array = np.concatenate((corrected_array, received_word))
         # syndromes = np.dot(corrected_array.reshape(-1, self.n), self.HT) % 2
         # print(syndromes)

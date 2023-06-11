@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Chenye Yang
+# Copyright (c) 2023 Chenye Yang, Pranav Kharche
 
 import channel
 from Utils import stat_analysis
@@ -46,7 +46,7 @@ print("Uncorrectable codewords:", uncorrectable_codewords)
 
 # Without correction
 # Decoding
-padding_length = (k - len(tx_msg)) % k
+padding_length = (- len(tx_msg)) % k
 rx_msg = cyclic_code.decoder_systematic(rx_codewords, padding_length)
 print("Before correction:")
 print("Decoded bits without correction:", rx_msg)
@@ -58,7 +58,7 @@ estimated_tx_codewords = cyclic_code.corrector_trapping(rx_codewords)
 print("After correction:")
 print("Estimated TX bits :", estimated_tx_codewords)
 # Decoding
-padding_length = (k - len(tx_msg)) % k
+padding_length = (- len(tx_msg)) % k
 rx_msg = cyclic_code.decoder_systematic(estimated_tx_codewords, padding_length)
 print("Decoded bits :", rx_msg)
 print("Number of correct bits:", stat_analysis.num_correct_bits(tx_msg, rx_msg))

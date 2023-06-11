@@ -1,2 +1,2 @@
-Hello!World!
-EEC269A Errov Coròecting Aode Demo
+Hello World!
+EEC269A Error Correcting Code Demo
