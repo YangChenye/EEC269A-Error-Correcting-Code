@@ -5,11 +5,14 @@ import logging
 import source
 import channel
 import destination
-from Utils import plot_wav
+from Utils import plot_wav, stat_analysis
 
 
 # Configure the logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='Result/logfile-linear.log',
+                    filemode='w', # Overwrite the file
+                    level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Create a logger in the main module
 logger = logging.getLogger(__name__)
@@ -22,6 +25,7 @@ def linear_txt():
 
     txt    - (7,4) linear    - bsc     - (7,4) linear    - txt
     """
+    logger.info("***TXT***")
     src = source.Source()
     chl = channel.Channel()
     linear_code = channel.Linear_Code()
@@ -35,16 +39,42 @@ def linear_txt():
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
+    # Statistic analysis
+    correct_codewords = stat_analysis.num_codeword_with_t_errors(tx_codeword, rx_codeword, 0, 7)
+    one_error_codewords = stat_analysis.num_codeword_with_t_errors(tx_codeword, rx_codeword, 1, 7)
+    total_codewords = len(tx_codeword) // 7
+    uncorrectable_codewords = total_codewords - correct_codewords - one_error_codewords
+    logger.info("Channel statistic analysis:")
+    logger.info("  Total codewords: %d", total_codewords)
+    logger.info("  Correct codewords: %d", correct_codewords)
+    logger.info("  Codeword error rate: %f", (total_codewords - correct_codewords) / total_codewords)
+    logger.info("    One error codewords: %d", one_error_codewords)
+    logger.info("    Uncorrectable codewords: %d", uncorrectable_codewords)
+
     # without error correction
     rx_msg = linear_code.decoder_systematic(rx_codeword)
     dest.set_digital_data(rx_msg)
     dest.write_txt("Result/linear-bsc-output.txt")
+
+    # Statistic analysis
+    correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
+    logger.info("Before correction:")
+    logger.info("  Number of correct bits: %d", correct_bits)
+    logger.info("  Number of incorrect bits: %d", len(tx_msg) - correct_bits)
+    logger.info("  Bit error rate: %f", (len(tx_msg) - correct_bits) / len(tx_msg))
 
     # with error correction
     estimated_tx_codeword = linear_code.corrector_syndrome(rx_codeword)
     rx_msg = linear_code.decoder_systematic(estimated_tx_codeword)
     dest.set_digital_data(rx_msg)
     dest.write_txt("Result/linear-bsc-output-syndrome-corrected.txt")
+
+    # Statistic analysis
+    correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
+    logger.info("After correction:")
+    logger.info("  Number of correct bits: %d", correct_bits)
+    logger.info("  Number of incorrect bits: %d", len(tx_msg) - correct_bits)
+    logger.info("  Bit error rate: %f", (len(tx_msg) - correct_bits) / len(tx_msg))
 
 
 def linear_png():
@@ -53,6 +83,7 @@ def linear_png():
 
     png    - (7,4) linear    - bsc     - (7,4) linear    - png
     """
+    logger.info("***PNG***")
     src = source.Source()
     chl = channel.Channel()
     linear_code = channel.Linear_Code()
@@ -66,16 +97,42 @@ def linear_png():
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
+    # Statistic analysis
+    correct_codewords = stat_analysis.num_codeword_with_t_errors(tx_codeword, rx_codeword, 0, 7)
+    one_error_codewords = stat_analysis.num_codeword_with_t_errors(tx_codeword, rx_codeword, 1, 7)
+    total_codewords = len(tx_codeword) // 7
+    uncorrectable_codewords = total_codewords - correct_codewords - one_error_codewords
+    logger.info("Channel statistic analysis:")
+    logger.info("  Total codewords: %d", total_codewords)
+    logger.info("  Correct codewords: %d", correct_codewords)
+    logger.info("  Codeword error rate: %f", (total_codewords - correct_codewords) / total_codewords)
+    logger.info("    One error codewords: %d", one_error_codewords)
+    logger.info("    Uncorrectable codewords: %d", uncorrectable_codewords)
+
     # without error correction
     rx_msg = linear_code.decoder_systematic(rx_codeword)
     dest.set_digital_data(rx_msg)
     dest.write_png_from_digital("Result/linear-bsc-output.png", height, width, channels)
+
+    # Statistic analysis
+    correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
+    logger.info("Before correction:")
+    logger.info("  Number of correct bits: %d", correct_bits)
+    logger.info("  Number of incorrect bits: %d", len(tx_msg) - correct_bits)
+    logger.info("  Bit error rate: %f", (len(tx_msg) - correct_bits) / len(tx_msg))
 
     # with error correction
     estimated_tx_codeword = linear_code.corrector_syndrome(rx_codeword)
     rx_msg = linear_code.decoder_systematic(estimated_tx_codeword)
     dest.set_digital_data(rx_msg)
     dest.write_png_from_digital("Result/linear-bsc-output-syndrome-corrected.png", height, width, channels)
+
+    # Statistic analysis
+    correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
+    logger.info("After correction:")
+    logger.info("  Number of correct bits: %d", correct_bits)
+    logger.info("  Number of incorrect bits: %d", len(tx_msg) - correct_bits)
+    logger.info("  Bit error rate: %f", (len(tx_msg) - correct_bits) / len(tx_msg))
 
 
 def linear_wav():
@@ -84,6 +141,7 @@ def linear_wav():
 
     wav    - (7,4) linear    - bsc     - (7,4) linear    - wav
     """
+    logger.info("***WAV***")
     src = source.Source()
     chl = channel.Channel()
     linear_code = channel.Linear_Code()
@@ -108,6 +166,18 @@ def linear_wav():
 
     rx_codeword = chl.binary_symmetric_channel(tx_codeword, 0.01)
 
+    # Statistic analysis
+    correct_codewords = stat_analysis.num_codeword_with_t_errors(tx_codeword, rx_codeword, 0, 7)
+    one_error_codewords = stat_analysis.num_codeword_with_t_errors(tx_codeword, rx_codeword, 1, 7)
+    total_codewords = len(tx_codeword) // 7
+    uncorrectable_codewords = total_codewords - correct_codewords - one_error_codewords
+    logger.info("Channel statistic analysis:")
+    logger.info("  Total codewords: %d", total_codewords)
+    logger.info("  Correct codewords: %d", correct_codewords)
+    logger.info("  Codeword error rate: %f", (total_codewords - correct_codewords) / total_codewords)
+    logger.info("    One error codewords: %d", one_error_codewords)
+    logger.info("    Uncorrectable codewords: %d", uncorrectable_codewords)
+
     # without error correction
     rx_msg = linear_code.decoder_systematic(rx_codeword)
 
@@ -116,6 +186,13 @@ def linear_wav():
 
     plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-time-domain-RX.png")
     plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-frequency-domain-RX.png")
+
+    # Statistic analysis
+    correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
+    logger.info("Before correction:")
+    logger.info("  Number of correct bits: %d", correct_bits)
+    logger.info("  Number of incorrect bits: %d", len(tx_msg) - correct_bits)
+    logger.info("  Bit error rate: %f", (len(tx_msg) - correct_bits) / len(tx_msg))
 
     # with error correction
     estimated_tx_codeword = linear_code.corrector_syndrome(rx_codeword)
@@ -126,6 +203,14 @@ def linear_wav():
 
     plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-time-domain-RX-syndrome-corrected.png")
     plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-frequency-domain-RX-syndrome-corrected.png")
+
+    # Statistic analysis
+    correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
+    logger.info("After correction:")
+    logger.info("  Number of correct bits: %d", correct_bits)
+    logger.info("  Number of incorrect bits: %d", len(tx_msg) - correct_bits)
+    logger.info("  Bit error rate: %f", (len(tx_msg) - correct_bits) / len(tx_msg))
+
 
 
 if __name__ == '__main__':

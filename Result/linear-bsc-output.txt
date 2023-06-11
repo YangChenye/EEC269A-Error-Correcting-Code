@@ -1,2 +1,2 @@
 Hello World!
-EEC249A ErRoò Correcting Code Demo
+EEC26A Error Correcting Code Dem.

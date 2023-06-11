@@ -111,7 +111,7 @@ class Linear_Code:
 
     def encoder_systematic(self, bits):
         """
-        Systematic - Encode the to-be-transmitted binary bits message with (7,4) hamming encoder, return the to-be-transmitted codewords
+        Systematic - Encode the to-be-transmitted binary bits message with (n,k) systematic encoder, pad with zero if not divisible, return the to-be-transmitted codewords
 
             @type  bits: ndarray
             @param bits: TX message
@@ -136,7 +136,7 @@ class Linear_Code:
 
     def decoder_systematic(self, encoded_array, padding_length=0):
         """
-        Systematic - Decode the received binary bits codeword with (7,4) Hamming decoder, return the received message
+        Systematic - Decode the received binary bits codeword with (n,k) systematic decoder, remove padding, return the received message
 
             @type  encoded_array: ndarray
             @param encoded_array: RX codewords
@@ -159,7 +159,7 @@ class Linear_Code:
         # Decode by taking the last self.k elements from each codeword
         decoded_array = reshaped_array[:, self.n - self.k:self.n].flatten()
 
-        logger.info(f"Error codeword rate: {err_count / (len(encoded_array) // self.n)}")
+        logger.debug(f"Error codeword rate: {err_count / (len(encoded_array) // self.n)}")
 
         # Remove the padding from the array
         if padding_length != 0:
@@ -170,7 +170,7 @@ class Linear_Code:
 
     def corrector_syndrome(self, received_array):
         """
-        Systematic - Correct the received binary bits codeword with (7,4) Hamming syndrome look-up table corrector, 
+        Systematic - Correct the received binary bits codeword with (n,k) Hamming syndrome look-up table corrector, 
         return the estimated TX codeword = (RX codeword + error pattern)
 
             @type  received_array: ndarray

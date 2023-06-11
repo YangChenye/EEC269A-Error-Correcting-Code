@@ -1,7 +1,7 @@
 # Copyright (c) 2023 Chenye Yang
 
 import channel
-from Utils import polyTools
+from Utils import polyTools, stat_analysis
 
 import numpy as np
 
@@ -31,11 +31,34 @@ print("Encoded bits      :", tx_codewords)
 rx_codewords = chl.binary_symmetric_channel(tx_codewords, 0.1)
 print("Bits after channel:", rx_codewords)
 
+
+# Statistic analysis
+correct_codewords = stat_analysis.num_codeword_with_t_errors(tx_codewords, rx_codewords, 0, n)
+one_error_codewords = stat_analysis.num_codeword_with_t_errors(tx_codewords, rx_codewords, 1, n)
+total_codewords = len(tx_codewords) // n
+uncorrectable_codewords = total_codewords - correct_codewords - one_error_codewords
+print("Channel statistic analysis:")
+print("Total codewords:", total_codewords)
+print("Correct codewords:", correct_codewords)
+print("One error codewords:", one_error_codewords)
+print("Uncorrectable codewords:", uncorrectable_codewords)
+
+
+# Without correction
+# Decoding
+padding_length = k - (len(tx_msg) % k)
+rx_msg = cyclic_code.decoder_systematic(rx_codewords, padding_length)
+print("Before correction:")
+print("Decoded bits without correction:", rx_msg)
+print("Number of correct bits:", stat_analysis.num_correct_bits(tx_msg, rx_msg))
+
+
 # Correction with syndrome look-up table
 estimated_tx_codewords = cyclic_code.corrector_syndrome(rx_codewords)
+print("After correction:")
 print("Estimated TX bits :", estimated_tx_codewords)
-
 # Decoding
 padding_length = k - (len(tx_msg) % k)
 rx_msg = cyclic_code.decoder_systematic(estimated_tx_codewords, padding_length)
 print("Decoded bits :", rx_msg)
+print("Number of correct bits:", stat_analysis.num_correct_bits(tx_msg, rx_msg))
