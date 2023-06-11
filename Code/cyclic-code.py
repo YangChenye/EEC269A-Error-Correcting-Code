@@ -20,13 +20,13 @@ logger = logging.getLogger(__name__)
 
 
 # Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code
-# Syndrome look-up table corrector
+# Syndrome look-up table corrector | trapping corrector
 N, K = 15, 11
 FLAG_SYNDROME = True
 FLAG_TRAPPING = False
 
 # Work with (15, 5) cyclic code
-# Syndrome look-up table corrector + trapping corrector
+# Syndrome look-up table corrector
 # N, K = 15, 5
 # FLAG_SYNDROME = False
 # FLAG_TRAPPING = True
