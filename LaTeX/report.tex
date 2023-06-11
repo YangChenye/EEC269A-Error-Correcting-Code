@@ -202,7 +202,7 @@ PNG files consist of a header followed by a series of data chunks, e.g.:
     \item Data Chunks (IDAT): These chunks contain the actual image data, which is formed by pixels. This data is compressed to reduce the size of the file.
     \item End Chunk (IEND): This is the final chunk in a PNG file. It does not contain any data and its purpose is to indicate the end of the file.
 \end{enumerate}
-Each chunk contains three standard fields: 4-byte length, 4-byte type code, 4-byte CRC and various internal fields that depend on the chunk type, shown in Figure~\ref{fig:png-structure}. 
+Each chunk contains three standard fields: 4-byte length, 4-byte type code, 4-byte CRC and various internal fields that depend on the chunk type, shown in Figure~\ref{fig:png-structure} \footnote{Figure~\ref{fig:png-structure} is from webpage \href{https://www.nayuki.io/res/dumb-png-output-java/png-file-format.svg}{PNG file chunk inspector - Project Nayuki}}. 
 For example, the image file we are using has more than one image data (IDAT) chunks, each of which contains a portion of the image, shown in Table~\ref{tab:our-png-structure}.
 
 \begin{figure}[htb]
@@ -291,7 +291,7 @@ Then, the array is flattened into a bit stream of 26,234,880 bits.
 WAV (Waveform Audio File Format) is a digital audio standard for storing audio bitstream on PCs. 
 WAV is an application of the Resource Interchange File Format (RIFF) method for storing data in chunks, and it is primarily used on Windows systems. 
 WAV files are typically used for raw and uncompressed audio, though they can also contain compressed audio.
-A WAV file is divided into several sections or chunks, shown in Figure~\ref{fig:canonical-wav-structure}. Each chunk serves a different purpose and holds different types of data. The basic structure of a WAV file includes the following chunks:
+A WAV file is divided into several sections or chunks, shown in Figure~\ref{fig:canonical-wav-structure} \footnote{Figure~\ref{fig:canonical-wav-structure} is from webpage \href{https://www.videoproc.com/resource/wav-file.htm}{WAV Files: File Structure, Case Analysis and PCM Explained}}. Each chunk serves a different purpose and holds different types of data. The basic structure of a WAV file includes the following chunks:
 \begin{enumerate}
     \item RIFF Chunk: The RIFF chunk is the first chunk in a WAV file and identifies the file as a WAV file. It includes a header with the "RIFF" identifier and an integer indicating the remaining length of the entire file.
     \item Format Chunk: Also known as the "fmt " chunk (with a space after 'fmt'), this contains important information about the audio data. This includes the audio format (e.g., PCM), the number of channels (mono, stereo, etc.), the sample rate, the byte rate, the block alignment, and the bit depth (bits per sample).
@@ -358,9 +358,20 @@ However, this is the trade-off for a better visualization, and will not affect t
 \section{Channel}
 
 \subsection{Binary Symmetric Channel (BSC)}
+The Binary Symmetric Channel (BSC) is a fundamental concept in information theory and telecommunications, specifically in the field of error detection and correction. It is a model used to represent a communication channel, where the information is transmitted in the form of binary digits, or bits: 0s and 1s.
 
+The "symmetric" aspect of the BSC refers to the fact that it has the same probability of an error occurring whether the transmitted bit is a 0 or a 1. For instance, if the error probability is 0.01, then 1\% of 0s are received as 1s, and 1\% of 1s are received as 0s. 
 
+A BSC is characterized by two parameters: the input bit and the crossover probability / error probability, shown in Figure~\ref{fig:bsc}. The input bit is either 0 or 1, which represents the binary information being transmitted. The crossover probability, often denoted as $p$, represents the likelihood of the transmitted bit being received incorrectly. 
 
+Although the model is simple, the BSC is a building block for understanding more complex communication systems. By studying the BSC, researchers can develop algorithms and systems that minimize errors in binary data transmission, improving the reliability of digital communications.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.3\textwidth]{bsc.png}
+    \caption{Binary Symmetric Channel (BSC)}
+    \label{fig:bsc}
+\end{figure}
 
 
 
@@ -381,8 +392,52 @@ However, this is the trade-off for a better visualization, and will not affect t
 
 
 \section{(7,4) Systematic Linear Block (Hamming) Code}
+The (7,4) Systematic Linear Block (Hamming) Code, often referred to simply as the Hamming (7,4) Code, is a fundamental concept in the realm of error detection and correction, and plays a crucial role in the field of digital communications and information theory. This coding scheme was introduced by Richard Hamming in the late 1940s to address the problem of error detection and correction in data transmission over noisy channels.
+
+The Hamming (7,4) Code is a block code that maps 4-bit messages to 7-bit codewords. It gets its name from the fact that it takes in 4 data bits and outputs 7 bits (including 3 parity bits). The parity bits are extra bits added to the data to enable the detection and correction of errors that might occur during transmission.
+
+A key characteristic of the Hamming (7,4) Code is its systematic form. This means that the bits of the original message appear unaltered in the encoded output, making it easy to extract the original data from the received message, even if errors are detected. 
+
+The Hamming (7,4) Code is designed to detect and correct single-bit errors, meaning it can identify and fix any situation where only one bit in the 7-bit codeword has been flipped due to noise or interference in the communication channel. This makes it a powerful tool in improving the reliability and robustness of data communication systems.
+
+
+
+\subsection{Encoder}
+The encoding process in a Hamming (7,4) code involves the multiplication of a 4-bit message vector with a generator matrix. The generator matrix for a (7,4) Hamming Code, in its systematic form, is given as:
+\begin{equation*}
+    G = 
+        \begin{bmatrix}
+        1 & 1 & 0 & 1 & 0 & 0 & 0 \\
+        0 & 1 & 1 & 0 & 1 & 0 & 0 \\
+        1 & 1 & 1 & 0 & 0 & 1 & 0 \\
+        1 & 0 & 1 & 0 & 0 & 0 & 1 \\
+        \end{bmatrix}.
+\end{equation*}
+If we denote the message vector as 
+\begin{equation*}
+    u =
+        \begin{bmatrix}
+        u_1 & u_2 & u_3 & u_4 
+        \end{bmatrix},
+\end{equation*}
+then the encoded codeword $v$ is computed by:
+\begin{equation*}
+    v = u \cdot G .
+\end{equation*}
+This multiplication produces a 7-bit codeword, which is then ready for transmission.
+
+
+
+
+
 \subsection{Syndrome Decoder}
-\subsubsection{Text string}
+The decoding process of the (7,4) Hamming code involves utilizing a syndrome lookup table. The syndrome, a binary vector, is computed from the received bits and is used to identify the error bit position. Each syndrome corresponds to a potential error location, and its lookup table is a key tool for efficient error correction.
+
+
+
+
+
+\subsubsection{Results: text string}
 
 \begin{table}[htb]
     \centering
@@ -401,7 +456,7 @@ However, this is the trade-off for a better visualization, and will not affect t
 
 
 
-\subsubsection{Image}
+\subsubsection{Results: image}
 
 
 \begin{figure}[htb]
@@ -458,7 +513,7 @@ However, this is the trade-off for a better visualization, and will not affect t
 \end{figure}
 
 
-\subsubsection{Audio}
+\subsubsection{Results: audio}
 
 
 \begin{figure}[htb]
@@ -516,6 +571,70 @@ However, this is the trade-off for a better visualization, and will not affect t
 
 
 \section{$(n,k)$ Systematic Cyclic (Hamming) Code}
+The $(n,k)$ Systematic Cyclic Hamming Code is a powerful and widely used error correction code (ECC) in the field of digital communications and information theory. The notation $(n,k)$ denotes that each block of the code consists of 'n' bits, where 'k' bits are the actual information or data, and the remaining 'n-k' bits are the parity or check bits used for error detection and correction.
+
+The term "systematic" implies that the data bits remain in their original form in the encoded output, while the parity bits are appended to form the full code word. This is in contrast to non-systematic coding schemes, where the data and parity bits are intermixed.
+
+"Cyclic" codes, meanwhile, have a key property where a cyclic shift of a code word results in another valid code word. This cyclic nature leads to efficient implementation, especially in hardware, as simple shift registers can be used.
+
+Hamming codes, named after Richard Hamming, are a specific class of linear error-correcting codes that are renowned for their ability to correct single-bit errors in code words. They accomplish this by introducing additional parity bits that allow the identification of single-bit errors.
+
+In the context of $(n,k)$ Systematic Cyclic Hamming Codes, the codes are designed such that any single-bit error can be detected and corrected, making them a reliable choice for environments where such errors are common and the integrity of information is paramount.
+
+
+\subsection{Adjustable $(n,k)$}
+\label{sec:adjustable-nk}
+\textcolor{red}{TODO}
+
+\subsection{Encoder}
+The encoding process in a $(n,k)$ Systematic Cyclic Code involves the multiplication of a $k$-bit message vector with a generator matrix. The generator matrix for a $(n,k)$ Cyclic Hamming Code, in its systematic form, is given as:
+% \begin{equation*}
+%     G = 
+%     \begin{bmatrix}
+%         1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+%         0 & 1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+%         0 & 0 & 1 & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+%         1 & 1 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+%         1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+%         0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+%         1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+%         0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+%         1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+%         1 & 0 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+%         1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1
+%     \end{bmatrix}
+% \end{equation*}
+\begin{equation*}
+    G = \begin{bmatrix}
+        P & I_{k}
+    \end{bmatrix}
+\end{equation*}
+where $I_k$ represents a $k$ by $k$ identity matrix, and $P$ represents a $k$ by $(n-k)$ matrix for parity-check bits. 
+Following is an example of the generator matrix for a $(15,11)$ Cyclic Hamming Code, which is generated with procedures in Section~\ref{sec:adjustable-nk}:
+\begin{equation*}
+    G = 
+    \begin{bmatrix}
+        1 & 1 & 0 & 0 & 1 & 0 & \cdots & 0 & 0 \\
+        0 & 1 & 1 & 0 & 0 & 1 & \cdots & 0 & 0 \\
+        \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+        1 & 0 & 1 & 1 & 0 & 0 & \cdots & 1 & 0 \\
+        1 & 0 & 0 & 1 & 0 & 0 & \cdots & 0 & 1 \\
+    \end{bmatrix}
+\end{equation*}
+If we denote the message vector as 
+\begin{equation*}
+    u =
+        \begin{bmatrix}
+        u_1 & u_2 & \dots & u_k 
+        \end{bmatrix},
+\end{equation*}
+then the encoded codeword $v$ is computed by:
+\begin{equation*}
+    v = u \cdot G .
+\end{equation*}
+This multiplication produces a $n$-bit codeword, which is then ready for transmission.
+
+
 \subsection{Syndrome Decoder}
 \subsubsection{Text string}
 
@@ -668,20 +787,21 @@ However, this is the trade-off for a better visualization, and will not affect t
 \section{Appendix: Python source code}
 \subsection{Source}
 \label{appendix:source}
-\lstinputlisting[language=Python]{../Code/Source/source.py}
+\lstinputlisting[language=Python]{../Code/source.py}
 
 \subsection{Channel}
 \label{appendix:channel}
-\lstinputlisting[language=Python]{../Code/Channel/channel.py}
+\lstinputlisting[language=Python]{../Code/channel.py}
 
 \subsection{Destination}
 \label{appendix:destination}
-\lstinputlisting[language=Python]{../Code/Destination/destination.py}
+\lstinputlisting[language=Python]{../Code/destination.py}
 
 \subsection{Utilities}
 \label{appendix:utils}
-\lstinputlisting[language=Python]{../Code/Utils/plot_wav.py}
 \lstinputlisting[language=Python]{../Code/Utils/polyTools.py}
+\lstinputlisting[language=Python]{../Code/Utils/plot_wav.py}
+\lstinputlisting[language=Python]{../Code/Utils/stat_analysis.py}
 
 \subsection{Linear code}
 \label{appendix:linear-code}
