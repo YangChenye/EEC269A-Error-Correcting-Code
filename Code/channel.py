@@ -238,26 +238,36 @@ class Cyclic_Code(Linear_Code):
             @return:  estimated TX codewords
         """
         reshaped_array = received_array.reshape(-1, self.n)
-        corrected_array = np.empty(0, dtype=np.uint8)
-        # print(reshaped_array)
+        corrected_array = np.empty(reshaped_array.shape, dtype=np.uint8)
+        print('size =', reshaped_array.shape)
+        # print('correcte\n', corrected_array, corrected_array.shape)
+        syndromes = np.dot(reshaped_array, self.HT) % 2
 
-        for received_word in reshaped_array:
-            for i in range(self.n):
-                syndrome = np.dot(received_word, self.HT) % 2
-                # print(i, syndrome)
-                if np.sum(syndrome) <= self.nECC:
+        for word_count, received_word in enumerate(reshaped_array):
+            if word_count % 100000 == 0:
+                print('count', word_count)
+            if syndromes[word_count].sum() == 0:
+                corrected_array[word_count] = received_word
+                continue
+            syndrome = syndromes[word_count]
+            for shift in range(self.n):
+                # print(shift, syndrome)
+                if syndrome.sum() <= self.nECC:
                     padding = np.zeros(self.k, dtype=np.uint8)
                     error = np.concatenate((syndrome, padding))
                     corrected_word = np.bitwise_xor(received_word, error)
-                    corrected_word = np.roll(corrected_word, i)
-                    corrected_array = np.concatenate((corrected_array, corrected_word))
+                    corrected_word = np.roll(corrected_word, shift)
+                    # print('word', np.roll(received_word, shift))
+                    # print('fix ', corrected_word)
+                    corrected_array[word_count] = corrected_word
                     break
                 received_word = np.roll(received_word, -1)
-                if i == self.n-1:
+                if shift == self.n-1:
                     logger.debug('Uncorrectable Error')
-                    corrected_array = np.concatenate((corrected_array, received_word))
-        # syndromes = np.dot(corrected_array.reshape(-1, self.n), self.HT) % 2
+                    corrected_array[word_count] = received_word
+                syndrome = np.dot(received_word, self.HT) % 2
         # print(syndromes)
+        corrected_array = corrected_array.flatten()
         return corrected_array
 
 
