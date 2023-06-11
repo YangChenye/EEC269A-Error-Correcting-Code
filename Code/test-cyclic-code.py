@@ -13,15 +13,15 @@ print("Original bits:", tx_msg)
 chl = channel.Channel()
 
 # Work with (15, 11) cyclic code
-n = 15
+n = 31
 k = 11
 
 # Create the generator matrix
-genMatrix_decimal = polyTools.findMatrix(n, k)
-G = polyTools.genMatrixDecmial2Ndarray(genMatrix_decimal, n)
+# genMatrix_decimal = polyTools.findMatrix(n, k)
+# G = polyTools.genMatrixDecmial2Ndarray(genMatrix_decimal, n)
 
 
-cyclic_code = channel.Cyclic_Code(G)
+cyclic_code = channel.Cyclic_Code(n,k,None)
 
 # Encoding
 tx_codewords = cyclic_code.encoder_systematic(tx_msg)
@@ -54,7 +54,7 @@ print("Number of correct bits:", stat_analysis.num_correct_bits(tx_msg, rx_msg))
 
 
 # Correction with syndrome look-up table
-estimated_tx_codewords = cyclic_code.corrector_syndrome(rx_codewords)
+estimated_tx_codewords = cyclic_code.corrector_trapping(rx_codewords)
 print("After correction:")
 print("Estimated TX bits :", estimated_tx_codewords)
 # Decoding

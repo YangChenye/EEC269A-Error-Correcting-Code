@@ -3,7 +3,7 @@
 import numpy as np
 import logging
 
-from Utils import polyTools
+from Utils import polyTools as pt
 
 # Create a logger in this module
 logger = logging.getLogger(__name__)
@@ -206,17 +206,36 @@ class Cyclic_Code(Linear_Code):
     """
     (n, k) Systematic Cyclic (Hamming) Code
     """
-    def __init__(self, G):
-        self.G = G
-        self.k, self.n = self.G.shape
+    # def __init__(self, G):
+    #     self.G = G
+    #     self.k, self.n = self.G.shape
+    #     self.H = create_parity_check_matrix(self.G)
+
+    #     self.syndrome_table = create_syndrome_table(self.H)
+
+    def __init__(self, n, k, nECC = 1):
+        self.n = n
+        self.k = k
+        self.G_dec = pt.findMatrix(self.n, self.k, nECC)
+        self.nECC = pt.correctableErrors(self.n, self.k, self.G_dec)
+        self.HT_dec = pt.buildParityMatrix(self.n, self.k, self.G_dec)
+        
+        self.G = pt.genMatrixDecmial2Ndarray(self.G_dec, self.n)
+        self.HT = pt.genMatrixDecmial2Ndarray(self.HT_dec, self.n-self.k)
+
+        print('generated a (',self.n,',', self.k, ') cyclic code', sep='')
+        print(self.nECC, 'correctable errors')
+        # print(self.G)
+        # print(self.HT)
         self.H = create_parity_check_matrix(self.G)
 
         self.syndrome_table = create_syndrome_table(self.H)
+        # print(self.syndrome_table)
 
 
-    def corrector_lfsr(self, received_array):
+    def corrector_trapping(self, received_array):
         """
-        Systematic - Correct the received binary bits codeword with (n, k) Hamming LFSR corrector,
+        Systematic - Correct the received binary bits codeword with (n, k) Error trapping corrector,
         return the estimated TX codeword = (RX codeword + error pattern)
 
             @type  received_array: ndarray
@@ -225,8 +244,28 @@ class Cyclic_Code(Linear_Code):
             @rtype:   ndarray
             @return:  estimated TX codewords
         """
-        corrected_array = received_array.copy()
-        pass
+        reshaped_array = received_array.reshape(-1, self.n)
+        corrected_array = np.empty(0, dtype=np.uint8)
+        # print(reshaped_array)
+
+        for received_word in reshaped_array:
+            for i in range(self.n):
+                syndrome = np.dot(received_word, self.HT) % 2
+                # print(i, syndrome)
+                if np.sum(syndrome) <= self.nECC:
+                    padding = np.zeros(self.k, dtype=np.uint8)
+                    error = np.concatenate((syndrome, padding))
+                    corrected_word = np.bitwise_xor(received_word, error)
+                    corrected_word = np.roll(corrected_word, i)
+                    corrected_array = np.concatenate((corrected_array, corrected_word))
+                    break
+                received_word = np.roll(received_word, -1)
+                if i == self.n-1:
+                    print('Uncorrectable Error')
+                    corrected_array = np.concatenate((corrected_array, received_word))
+        # syndromes = np.dot(corrected_array.reshape(-1, self.n), self.HT) % 2
+        # print(syndromes)
+        return corrected_array
 
 
 class Channel:
