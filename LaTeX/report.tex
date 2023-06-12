@@ -115,23 +115,22 @@
     \hline
     Source & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
     \hline
-    \multirow{2}{*}{Encoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & Chenye \\ 
-    & $(n,k)$ Systematic Cyclic (Hamming) Code & Pranav, Chenye \\ 
+    \multirow{2}{*}{Encoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & \multirow{2}{*}{Chenye} \\ 
+    & $(n,k)$ Systematic Cyclic Code & \\ 
     \hline
-    \multirow{2}{*}{Channel} & Binary Symmetric Channel (BSC), error probability $p$ adjustable & Chenye \\ 
-    & AWGN & Parisa \\ 
+    Channel & Binary Symmetric Channel (BSC), adjustable error prob $p$ & Chenye \\ 
     \hline
     \multirow{3}{*}{Error Corrector} &  Syndrome Lookup Table for $(7,4)$ Linear Code & Chenye \\ 
-    & Syndrome Lookup Table for $(n,k)$ Cyclic Code & Chenye \\ 
-    & LFSR for $(n,k)$ Cyclic Code & Pranav \\
+    & Syndrome Lookup Table for $(n,k)$ Cyclic Code, $t=1$ & Chenye \\ 
+    & Error Trapping for $(n,k)$ Cyclic Code, adjustable $t$ & Pranav \\
     \hline
-    \multirow{2}{*}{Decoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & Chenye \\ 
-    & $(n,k)$ Systematic Cyclic (Hamming) Code & Chenye \\ 
+    \multirow{2}{*}{Decoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & \multirow{2}{*}{Chenye} \\ 
+    & $(n,k)$ Systematic Cyclic Code &  \\ 
     \hline
     Destination & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
     \hline
-    \multirow{2}{*}{\textbf{Advanced features}} & \textbf{Create generator matrix for $(n,k)$ cyclic code} & Pranav \\ 
-    & \textbf{Adjustable $(n,k)$} & Pranav \\
+    \multirow{2}{*}{\textbf{Advanced features}} & \textbf{Create generator matrix for $(n,k)$ cyclic code} & \multirow{2}{*}{Pranav} \\ 
+    & \textbf{Adjustable: $(n,k)$ and correctable errors $t$} &  \\
     \hline
     \textbf{Presentation} & Slides & Parisa \\ 
     \hline
@@ -324,14 +323,14 @@ Then, the array is flattened into a bit stream of 8,583,584 bits.
 
 \begin{figure}[htb]
     \centering
-    \includegraphics[width=\textwidth]{../Result/wav-time-domain-TX.png}
+    \includegraphics[width=\textwidth]{../Result/Linear/wav-time-domain-TX.png}
     \caption{Time domain waveform of our testing audio file}
     \label{fig:our-audio-time-domain}
 \end{figure}
 
 \begin{figure}[htb]
     \centering
-    \includegraphics[width=\textwidth]{../Result/wav-frequency-domain-TX.png}
+    \includegraphics[width=\textwidth]{../Result/Linear/wav-frequency-domain-TX.png}
     \caption{Frequency domain waveform of our testing audio file}
     \label{fig:our-audio-frequency-domain}
 \end{figure}
@@ -431,6 +430,7 @@ This multiplication produces a 7-bit codeword, which is then ready for transmiss
 
 
 \subsection{Syndrome Decoder}
+For the Hamming (7, 4) Code, the parity check matrix H is a 3 by 7 matrix that is used to detect errors in received code words. In this context, the matrix is designed such that the product of H and any valid code word (expressed as a column vector) is a zero vector. This property is used to detect errors in received messages: if the product of H and the received vector is not zero, then the received vector is not a valid code word, and an error has occurred.
 The decoding process of the (7,4) Hamming code involves utilizing a syndrome lookup table. The syndrome, a binary vector, is computed from the received bits and is used to identify the error bit position. Each syndrome corresponds to a potential error location, and its lookup table is a key tool for efficient error correction.
 
 
@@ -470,14 +470,14 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/linear-bsc-output.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-output.png}
         \caption{Without correction}
         \label{fig:image-linear-bsc-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/linear-bsc-output-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:image-linear-bsc-syndrome-corrected}
     \end{subfigure}
@@ -497,14 +497,14 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cropped-linear-bsc-output.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/cropped-linear-bsc-output.png}
         \caption{Without correction}
         \label{fig:cropped-image-linear-bsc-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cropped-linear-bsc-output-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/cropped-linear-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:cropped-image-linear-bsc-syndrome-corrected}
     \end{subfigure}
@@ -520,21 +520,21 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/wav-time-domain-TX.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/wav-time-domain-TX.png}
         \caption{Original}
         \label{fig:t-audio-linear-bsc-original}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/linear-bsc-wav-time-domain-RX.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-time-domain-RX.png}
         \caption{Without correction}
         \label{fig:t-audio-linear-bsc-no-correction}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/linear-bsc-wav-time-domain-RX-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-time-domain-RX-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:t-audio-linear-bsc-syndrome-syndrome-corrected}
     \end{subfigure}
@@ -547,21 +547,21 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/wav-frequency-domain-TX.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/wav-frequency-domain-TX.png}
         \caption{Original}
         \label{fig:f-audio-linear-bsc-original}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/linear-bsc-wav-frequency-domain-RX.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-frequency-domain-RX.png}
         \caption{Without correction}
         \label{fig:f-audio-linear-bsc-no-correction}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/linear-bsc-wav-frequency-domain-RX-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-frequency-domain-RX-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:f-audio-linear-bsc-syndrome-corrected}
     \end{subfigure}
@@ -570,19 +570,19 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
 \end{figure}
 
 
-\section{$(n,k)$ Systematic Cyclic (Hamming) Code}
-The $(n,k)$ Systematic Cyclic Hamming Code is a powerful and widely used error correction code (ECC) in the field of digital communications and information theory. The notation $(n,k)$ denotes that each block of the code consists of 'n' bits, where 'k' bits are the actual information or data, and the remaining 'n-k' bits are the parity or check bits used for error detection and correction.
+\section{$(n,k)$ Systematic Cyclic Code}
+The $(n,k)$ Systematic Cyclic Code is a powerful and widely used error correction code (ECC) in the field of digital communications and information theory. The notation $(n,k)$ denotes that each block of the code consists of '$n$' bits, where '$k$' bits are the actual information or data, and the remaining '$n-k$' bits are the parity or check bits used for error detection and correction.
 
 The term "systematic" implies that the data bits remain in their original form in the encoded output, while the parity bits are appended to form the full code word. This is in contrast to non-systematic coding schemes, where the data and parity bits are intermixed.
 
 "Cyclic" codes, meanwhile, have a key property where a cyclic shift of a code word results in another valid code word. This cyclic nature leads to efficient implementation, especially in hardware, as simple shift registers can be used.
 
-Hamming codes, named after Richard Hamming, are a specific class of linear error-correcting codes that are renowned for their ability to correct single-bit errors in code words. They accomplish this by introducing additional parity bits that allow the identification of single-bit errors.
+When the linear error-correcting codes is able to correct only single-bit errors in codewords, they are also called "Hamming" code. They accomplish this by introducing additional parity bits that allow the identification of single-bit errors.
 
-In the context of $(n,k)$ Systematic Cyclic Hamming Codes, the codes are designed such that any single-bit error can be detected and corrected, making them a reliable choice for environments where such errors are common and the integrity of information is paramount.
+In the context of $(n,k)$ Systematic Cyclic Codes, the codes are designed such that any $t$-bit error can be detected and corrected, making them a reliable choice for environments where such errors are common and the integrity of information is paramount.
 
 
-\subsection{Adjustable $(n,k)$}
+\subsection{Adjustable $(n,k)$ for correcting $t$ errors}
 \label{sec:adjustable-nk}
 \textcolor{red}{TODO}
 
@@ -636,6 +636,8 @@ This multiplication produces a $n$-bit codeword, which is then ready for transmi
 
 
 \subsection{Syndrome Decoder}
+When there are only 1-bit errors in the received codewords, the error bit can be corrected by using the syndrome lookup table.
+
 \subsubsection{Text string}
 
 \begin{table}[htb]
@@ -668,14 +670,14 @@ This multiplication produces a $n$-bit codeword, which is then ready for transmi
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cyclic-bsc-output.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-output.png}
         \caption{Without correction}
         \label{fig:image-cyclic-bsc-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cyclic-bsc-output-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:image-cyclic-bsc-syndrome-corrected}
     \end{subfigure}
@@ -697,14 +699,14 @@ This multiplication produces a $n$-bit codeword, which is then ready for transmi
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cropped-cyclic-bsc-output.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cropped-cyclic-bsc-output.png}
         \caption{Without correction}
         \label{fig:cropped-image-cyclic-bsc-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cropped-cyclic-bsc-output-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cropped-cyclic-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:cropped-image-cyclic-bsc-syndrome-corrected}
     \end{subfigure}
@@ -725,21 +727,21 @@ This multiplication produces a $n$-bit codeword, which is then ready for transmi
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/wav-time-domain-TX.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/wav-time-domain-TX.png}
         \caption{Original}
         \label{fig:t-audio-cyclic-bsc-original}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cyclic-bsc-wav-time-domain-RX.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-time-domain-RX.png}
         \caption{Without correction}
         \label{fig:t-audio-cyclic-bsc-no-correction}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cyclic-bsc-wav-time-domain-RX-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-time-domain-RX-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:t-audio-cyclic-bsc-syndrome-syndrome-corrected}
     \end{subfigure}
@@ -753,21 +755,21 @@ This multiplication produces a $n$-bit codeword, which is then ready for transmi
     \centering
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/wav-frequency-domain-TX.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/wav-frequency-domain-TX.png}
         \caption{Original}
         \label{fig:f-audio-cyclic-bsc-original}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cyclic-bsc-wav-frequency-domain-RX.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-frequency-domain-RX.png}
         \caption{Without correction}
         \label{fig:f-audio-cyclic-bsc-no-correction}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{../Result/cyclic-bsc-wav-frequency-domain-RX-syndrome-corrected.png}
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-frequency-domain-RX-syndrome-corrected.png}
         \caption{Corrected}
         \label{fig:f-audio-cyclic-bsc-syndrome-corrected}
     \end{subfigure}
@@ -780,7 +782,8 @@ This multiplication produces a $n$-bit codeword, which is then ready for transmi
 
 
 
-\subsection{LFSR Decoder}
+\subsection{Error Trapping Decoder}
+\textcolor{red}{TODO}
 
 
 \newpage
