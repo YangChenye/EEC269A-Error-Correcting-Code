@@ -19,46 +19,37 @@ FLAG_SYSTEMATIC_CYCLIC_CODE = True
 # Cyclic Code:
 # Encoder: (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) cyclic hamming code (t=1)
 # Decoder: Syndrome look-up table corrector | trapping corrector
-# N, K = 127, 120
+# N, K = 15, 11
 # FLAG_SYNDROME = True
 # FLAG_TRAPPING = False
 
 # Encoder: (15, 11, 1) (15, 7, 2) (15, 5, 3) (31, 26, 1) (31, 21, 2) (31, 16, 3) (31, 11, 5) (31, 6, 7) cyclic code
 # Decoder: Trapping corrector
-N, K = 31, 6
+N, K = 31, 16
 FLAG_SYNDROME = False
 FLAG_TRAPPING = True
 
 ''' 3rd choose the channel '''
 # BSC
-ERROR_PROB = 0.01
+ERROR_PROB = 0.02
 
 ''' 4th choose the source type '''
 # TXT, PNG, WAV
 FLAG_TXT = True
 FLAG_PNG = True
-FLAG_WAV = True
+FLAG_WAV = False
 
 # choose one image
 # PNG_PATH = "image.png"
-PNG_PATH = "image2.png"
+# PNG_PATH = "image2.png"
 # PNG_PATH = "image3.png"
-# PNG_PATH = "image4.png"
+PNG_PATH = "image4.png"
 
 
 
 
 
 
-
-# Configure the logging
-logging.basicConfig(filename='Result/Demo/logfile.log',
-                    filemode='a', # Append the file
-                    level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Create a logger in the main module
-logger = logging.getLogger(__name__)
 
 
 
@@ -71,6 +62,16 @@ if FLAG_SYSTEMATIC_CYCLIC_CODE:
     # Check if the directory exists
     if not os.path.exists(f'Result/Demo/Cyclic/{N}-{K}/'):
         os.makedirs(f'Result/Demo/Cyclic/{N}-{K}/')
+
+
+# Configure the logging
+logging.basicConfig(filename='Result/Demo/logfile.log',
+                    filemode='a', # Append the file
+                    level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Create a logger in the main module
+logger = logging.getLogger(__name__)
 
 
 
