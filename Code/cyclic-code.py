@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Chenye Yang
 
 import logging
+import os
 
 import source
 import channel
@@ -8,28 +9,32 @@ import destination
 from Utils import plot_wav, stat_analysis
 
 
+
+# Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code
+# Syndrome look-up table corrector | trapping corrector
+# N, K = 127, 120
+# FLAG_SYNDROME = True
+# FLAG_TRAPPING = False
+
+# Work with (15, 5) cyclic code
+# Syndrome look-up table corrector
+N, K = 15, 5
+FLAG_SYNDROME = False
+FLAG_TRAPPING = True
+
+
+# Check if the directory exists
+if not os.path.exists(f'Result/Cyclic/{N}-{K}/'):
+    os.makedirs(f'Result/Cyclic/{N}-{K}/')
+
 # Configure the logging
-logging.basicConfig(filename='Result/logfile-cyclic.log',
-                    filemode='w', # Overwrite the file
+logging.basicConfig(filename=f'Result/Cyclic/{N}-{K}/logfile-cyclic.log',
+                    filemode='a', # Append the file
                     level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Create a logger in the main module
 logger = logging.getLogger(__name__)
-
-
-
-# Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code
-# Syndrome look-up table corrector | trapping corrector
-N, K = 15, 11
-FLAG_SYNDROME = True
-FLAG_TRAPPING = False
-
-# Work with (15, 5) cyclic code
-# Syndrome look-up table corrector
-# N, K = 15, 5
-# FLAG_SYNDROME = False
-# FLAG_TRAPPING = True
 
 
 
@@ -73,7 +78,7 @@ def cyclic_txt():
     # without error correction
     rx_msg = cyclic_code.decoder_systematic(rx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
-    dest.write_txt("Result/cyclic-bsc-output.txt")
+    dest.write_txt(f"Result/Cyclic/{N}-{K}/cyclic-bsc-output.txt")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -89,7 +94,10 @@ def cyclic_txt():
         estimated_tx_codeword = cyclic_code.corrector_trapping(rx_codeword)
     rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
-    dest.write_txt("Result/cyclic-bsc-output-syndrome-corrected.txt")
+    if FLAG_SYNDROME:
+        dest.write_txt(f"Result/Cyclic/{N}-{K}/cyclic-bsc-output-syndrome-corrected.txt")
+    elif FLAG_TRAPPING:
+        dest.write_txt(f"Result/Cyclic/{N}-{K}/cyclic-bsc-output-trapping-corrected.txt")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -142,7 +150,7 @@ def cyclic_png():
     # without error correction
     rx_msg = cyclic_code.decoder_systematic(rx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
-    dest.write_png_from_digital("Result/cyclic-bsc-output.png", height, width, channels)
+    dest.write_png_from_digital(f"Result/Cyclic/{N}-{K}/cyclic-bsc-output.png", height, width, channels)
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -158,7 +166,10 @@ def cyclic_png():
         estimated_tx_codeword = cyclic_code.corrector_trapping(rx_codeword)
     rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword, padding_length)
     dest.set_digital_data(rx_msg)
-    dest.write_png_from_digital("Result/cyclic-bsc-output-syndrome-corrected.png", height, width, channels)
+    if FLAG_SYNDROME:
+        dest.write_png_from_digital(f"Result/Cyclic/{N}-{K}/cyclic-bsc-output-syndrome-corrected.png", height, width, channels)
+    elif FLAG_TRAPPING:
+        dest.write_png_from_digital(f"Result/Cyclic/{N}-{K}/cyclic-bsc-output-trapping-corrected.png", height, width, channels)
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -185,8 +196,8 @@ def cyclic_wav():
 
 
     shape, sample_rate = src.read_wav("Resource/file_example_WAV_1MG.wav")
-    plot_wav.plot_wav_time_domain(src.get_analogue_data(), sample_rate, "Result/wav-time-domain-TX.png")
-    plot_wav.plot_wav_frequency_domain(src.get_analogue_data(), sample_rate, "Result/wav-frequency-domain-TX.png")
+    plot_wav.plot_wav_time_domain(src.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/wav-time-domain-TX.png")
+    plot_wav.plot_wav_frequency_domain(src.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/wav-frequency-domain-TX.png")
 
     # tx_msg = src.get_analogue_data()
     # rx_msg = tx_msg
@@ -223,10 +234,10 @@ def cyclic_wav():
     rx_msg = cyclic_code.decoder_systematic(rx_codeword, padding_length)
 
     dest.set_digital_data(rx_msg)
-    dest.write_wav_from_digital(shape, sample_rate, "Result/cyclic-bsc-output.wav")
+    dest.write_wav_from_digital(shape, sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-output.wav")
 
-    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/cyclic-bsc-wav-time-domain-RX.png")
-    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/cyclic-bsc-wav-frequency-domain-RX.png")
+    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-wav-time-domain-RX.png")
+    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-wav-frequency-domain-RX.png")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -243,10 +254,15 @@ def cyclic_wav():
     rx_msg = cyclic_code.decoder_systematic(estimated_tx_codeword, padding_length)
 
     dest.set_digital_data(rx_msg)
-    dest.write_wav_from_digital(shape, sample_rate, "Result/cyclic-bsc-output-syndrome-corrected.wav")
+    if FLAG_SYNDROME:
+        dest.write_wav_from_digital(shape, sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-output-syndrome-corrected.wav")
+        plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-wav-time-domain-RX-syndrome-corrected.png")
+        plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-wav-frequency-domain-RX-syndrome-corrected.png")
+    elif FLAG_TRAPPING:
+        dest.write_wav_from_digital(shape, sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-output-trapping-corrected.wav")
+        plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-wav-time-domain-RX-trapping-corrected.png")
+        plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, f"Result/Cyclic/{N}-{K}/cyclic-bsc-wav-frequency-domain-RX-trapping-corrected.png")
 
-    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/cyclic-bsc-wav-time-domain-RX-syndrome-corrected.png")
-    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/cyclic-bsc-wav-frequency-domain-RX-syndrome-corrected.png")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)

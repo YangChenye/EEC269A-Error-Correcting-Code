@@ -239,13 +239,13 @@ class Cyclic_Code(Linear_Code):
         """
         reshaped_array = received_array.reshape(-1, self.n)
         corrected_array = np.empty(reshaped_array.shape, dtype=np.uint8)
-        print('size =', reshaped_array.shape)
+        logger.debug('size = %s', reshaped_array.shape)
         # print('correcte\n', corrected_array, corrected_array.shape)
         syndromes = np.dot(reshaped_array, self.HT) % 2
 
         for word_count, received_word in enumerate(reshaped_array):
             if word_count % 100000 == 0:
-                print('count', word_count)
+                logger.debug('count: %s', word_count)
             if syndromes[word_count].sum() == 0:
                 corrected_array[word_count] = received_word
                 continue

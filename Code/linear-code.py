@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Chenye Yang
 
 import logging
+import os
 
 import source
 import channel
@@ -8,8 +9,12 @@ import destination
 from Utils import plot_wav, stat_analysis
 
 
+# Check if the directory exists
+if not os.path.exists('Result/Linear/'):
+    os.makedirs('Result/Linear/')
+
 # Configure the logging
-logging.basicConfig(filename='Result/logfile-linear.log',
+logging.basicConfig(filename='Result/Linear/logfile-linear.log',
                     filemode='w', # Overwrite the file
                     level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -54,7 +59,7 @@ def linear_txt():
     # without error correction
     rx_msg = linear_code.decoder_systematic(rx_codeword)
     dest.set_digital_data(rx_msg)
-    dest.write_txt("Result/linear-bsc-output.txt")
+    dest.write_txt("Result/Linear/linear-bsc-output.txt")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -67,7 +72,7 @@ def linear_txt():
     estimated_tx_codeword = linear_code.corrector_syndrome(rx_codeword)
     rx_msg = linear_code.decoder_systematic(estimated_tx_codeword)
     dest.set_digital_data(rx_msg)
-    dest.write_txt("Result/linear-bsc-output-syndrome-corrected.txt")
+    dest.write_txt("Result/Linear/linear-bsc-output-syndrome-corrected.txt")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -112,7 +117,7 @@ def linear_png():
     # without error correction
     rx_msg = linear_code.decoder_systematic(rx_codeword)
     dest.set_digital_data(rx_msg)
-    dest.write_png_from_digital("Result/linear-bsc-output.png", height, width, channels)
+    dest.write_png_from_digital("Result/Linear/linear-bsc-output.png", height, width, channels)
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -125,7 +130,7 @@ def linear_png():
     estimated_tx_codeword = linear_code.corrector_syndrome(rx_codeword)
     rx_msg = linear_code.decoder_systematic(estimated_tx_codeword)
     dest.set_digital_data(rx_msg)
-    dest.write_png_from_digital("Result/linear-bsc-output-syndrome-corrected.png", height, width, channels)
+    dest.write_png_from_digital("Result/Linear/linear-bsc-output-syndrome-corrected.png", height, width, channels)
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -149,15 +154,15 @@ def linear_wav():
 
 
     shape, sample_rate = src.read_wav("Resource/file_example_WAV_1MG.wav")
-    plot_wav.plot_wav_time_domain(src.get_analogue_data(), sample_rate, "Result/wav-time-domain-TX.png")
-    plot_wav.plot_wav_frequency_domain(src.get_analogue_data(), sample_rate, "Result/wav-frequency-domain-TX.png")
+    plot_wav.plot_wav_time_domain(src.get_analogue_data(), sample_rate, "Result/Linear/wav-time-domain-TX.png")
+    plot_wav.plot_wav_frequency_domain(src.get_analogue_data(), sample_rate, "Result/Linear/wav-frequency-domain-TX.png")
 
     # tx_msg = src.get_analogue_data()
     # rx_msg = tx_msg
     # dest.set_analogue_data(rx_msg)
-    # plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/wav-time-domain-RX.png")
-    # plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/wav-frequency-domain-RX.png")
-    # dest.write_wav_from_analogue(sample_rate, "Result/hamming-bsc-output.wav")
+    # plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/Linear/wav-time-domain-RX.png")
+    # plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/Linear/wav-frequency-domain-RX.png")
+    # dest.write_wav_from_analogue(sample_rate, "Result/Linear/hamming-bsc-output.wav")
 
 
     tx_msg = src.get_digital_data()
@@ -182,10 +187,10 @@ def linear_wav():
     rx_msg = linear_code.decoder_systematic(rx_codeword)
 
     dest.set_digital_data(rx_msg)
-    dest.write_wav_from_digital(shape, sample_rate, "Result/linear-bsc-output.wav")
+    dest.write_wav_from_digital(shape, sample_rate, "Result/Linear/linear-bsc-output.wav")
 
-    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-time-domain-RX.png")
-    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-frequency-domain-RX.png")
+    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/Linear/linear-bsc-wav-time-domain-RX.png")
+    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/Linear/linear-bsc-wav-frequency-domain-RX.png")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)
@@ -199,10 +204,10 @@ def linear_wav():
     rx_msg = linear_code.decoder_systematic(estimated_tx_codeword)
 
     dest.set_digital_data(rx_msg)
-    dest.write_wav_from_digital(shape, sample_rate, "Result/linear-bsc-output-syndrome-corrected.wav")
+    dest.write_wav_from_digital(shape, sample_rate, "Result/Linear/linear-bsc-output-syndrome-corrected.wav")
 
-    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-time-domain-RX-syndrome-corrected.png")
-    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/linear-bsc-wav-frequency-domain-RX-syndrome-corrected.png")
+    plot_wav.plot_wav_time_domain(dest.get_analogue_data(), sample_rate, "Result/Linear/linear-bsc-wav-time-domain-RX-syndrome-corrected.png")
+    plot_wav.plot_wav_frequency_domain(dest.get_analogue_data(), sample_rate, "Result/Linear/linear-bsc-wav-frequency-domain-RX-syndrome-corrected.png")
 
     # Statistic analysis
     correct_bits = stat_analysis.num_correct_bits(tx_msg, rx_msg)

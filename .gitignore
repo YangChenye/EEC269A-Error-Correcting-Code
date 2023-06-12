@@ -465,5 +465,5 @@ TSWLatexianTemp*
 #*Notes.bib
 
 
-# Exculde the log in Result folder
-!Result/*.log
+# Exclude the log in Result folder
+!Result/**/*.log

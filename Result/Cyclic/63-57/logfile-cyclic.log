@@ -1,0 +1,150 @@
+2023-06-11 17:33:24,842 - __main__ - INFO - ***TXT***
+2023-06-11 17:33:25,101 - channel - INFO - Generated a (63, 57) cyclic code
+2023-06-11 17:33:25,101 - channel - INFO - 1 correctable errors
+2023-06-11 17:33:25,101 - channel - INFO - Generator matrix:
+[[1 1 0 ... 0 0 0]
+ [0 1 1 ... 0 0 0]
+ [0 0 1 ... 0 0 0]
+ ...
+ [1 0 0 ... 1 0 0]
+ [1 0 0 ... 0 1 0]
+ [1 0 0 ... 0 0 1]]
+2023-06-11 17:33:25,102 - __main__ - INFO - Channel statistic analysis:
+2023-06-11 17:33:25,102 - __main__ - INFO -   Total codewords: 7
+2023-06-11 17:33:25,102 - __main__ - INFO -   Correct codewords: 5
+2023-06-11 17:33:25,102 - __main__ - INFO -   Codeword error rate: 0.285714
+2023-06-11 17:33:25,102 - __main__ - INFO -     1 error codewords: 1
+2023-06-11 17:33:25,102 - __main__ - INFO -     Uncorrectable codewords: 1
+2023-06-11 17:33:25,102 - __main__ - INFO - Before correction:
+2023-06-11 17:33:25,102 - __main__ - INFO -   Number of correct bits: 373
+2023-06-11 17:33:25,102 - __main__ - INFO -   Number of incorrect bits: 3
+2023-06-11 17:33:25,102 - __main__ - INFO -   Bit error rate: 0.007979
+2023-06-11 17:33:25,102 - __main__ - INFO - After correction (syndrome):
+2023-06-11 17:33:25,102 - __main__ - INFO -   Number of correct bits: 373
+2023-06-11 17:33:25,102 - __main__ - INFO -   Number of incorrect bits: 3
+2023-06-11 17:33:25,102 - __main__ - INFO -   Bit error rate: 0.007979
+2023-06-11 17:33:25,102 - __main__ - INFO - ***PNG***
+2023-06-11 17:33:25,267 - channel - INFO - Generated a (63, 57) cyclic code
+2023-06-11 17:33:25,267 - channel - INFO - 1 correctable errors
+2023-06-11 17:33:25,267 - channel - INFO - Generator matrix:
+[[1 1 0 ... 0 0 0]
+ [0 1 1 ... 0 0 0]
+ [0 0 1 ... 0 0 0]
+ ...
+ [1 0 0 ... 1 0 0]
+ [1 0 0 ... 0 1 0]
+ [1 0 0 ... 0 0 1]]
+2023-06-11 17:33:26,177 - __main__ - INFO - Channel statistic analysis:
+2023-06-11 17:33:26,177 - __main__ - INFO -   Total codewords: 460262
+2023-06-11 17:33:26,177 - __main__ - INFO -   Correct codewords: 244801
+2023-06-11 17:33:26,177 - __main__ - INFO -   Codeword error rate: 0.468127
+2023-06-11 17:33:26,177 - __main__ - INFO -     1 error codewords: 154806
+2023-06-11 17:33:26,177 - __main__ - INFO -     Uncorrectable codewords: 60655
+2023-06-11 17:33:26,702 - __main__ - INFO - Before correction:
+2023-06-11 17:33:26,702 - __main__ - INFO -   Number of correct bits: 25972681
+2023-06-11 17:33:26,702 - __main__ - INFO -   Number of incorrect bits: 262199
+2023-06-11 17:33:26,702 - __main__ - INFO -   Bit error rate: 0.009994
+2023-06-11 17:33:28,506 - __main__ - INFO - After correction (syndrome):
+2023-06-11 17:33:28,506 - __main__ - INFO -   Number of correct bits: 26058233
+2023-06-11 17:33:28,506 - __main__ - INFO -   Number of incorrect bits: 176647
+2023-06-11 17:33:28,506 - __main__ - INFO -   Bit error rate: 0.006733
+2023-06-11 17:33:28,508 - __main__ - INFO - ***WAV***
+2023-06-11 17:33:28,673 - channel - INFO - Generated a (63, 57) cyclic code
+2023-06-11 17:33:28,674 - channel - INFO - 1 correctable errors
+2023-06-11 17:33:28,674 - channel - INFO - Generator matrix:
+[[1 1 0 ... 0 0 0]
+ [0 1 1 ... 0 0 0]
+ [0 0 1 ... 0 0 0]
+ ...
+ [1 0 0 ... 1 0 0]
+ [1 0 0 ... 0 1 0]
+ [1 0 0 ... 0 0 1]]
+2023-06-11 17:33:30,931 - __main__ - INFO - Channel statistic analysis:
+2023-06-11 17:33:30,931 - __main__ - INFO -   Total codewords: 150590
+2023-06-11 17:33:30,931 - __main__ - INFO -   Correct codewords: 80253
+2023-06-11 17:33:30,931 - __main__ - INFO -   Codeword error rate: 0.467076
+2023-06-11 17:33:30,931 - __main__ - INFO -     1 error codewords: 50643
+2023-06-11 17:33:30,931 - __main__ - INFO -     Uncorrectable codewords: 19694
+2023-06-11 17:33:33,796 - __main__ - INFO - Before correction:
+2023-06-11 17:33:33,796 - __main__ - INFO -   Number of correct bits: 8498077
+2023-06-11 17:33:33,796 - __main__ - INFO -   Number of incorrect bits: 85507
+2023-06-11 17:33:33,796 - __main__ - INFO -   Bit error rate: 0.009962
+2023-06-11 17:33:36,718 - __main__ - INFO - After correction (syndrome):
+2023-06-11 17:33:36,718 - __main__ - INFO -   Number of correct bits: 8526235
+2023-06-11 17:33:36,718 - __main__ - INFO -   Number of incorrect bits: 57349
+2023-06-11 17:33:36,718 - __main__ - INFO -   Bit error rate: 0.006681
+2023-06-11 17:43:47,679 - __main__ - INFO - ***TXT***
+2023-06-11 17:43:47,923 - channel - INFO - Generated a (63, 57) cyclic code
+2023-06-11 17:43:47,923 - channel - INFO - 1 correctable errors
+2023-06-11 17:43:47,923 - channel - INFO - Generator matrix:
+[[1 1 0 ... 0 0 0]
+ [0 1 1 ... 0 0 0]
+ [0 0 1 ... 0 0 0]
+ ...
+ [1 0 0 ... 1 0 0]
+ [1 0 0 ... 0 1 0]
+ [1 0 0 ... 0 0 1]]
+2023-06-11 17:43:47,924 - __main__ - INFO - Channel statistic analysis:
+2023-06-11 17:43:47,924 - __main__ - INFO -   Total codewords: 7
+2023-06-11 17:43:47,924 - __main__ - INFO -   Correct codewords: 3
+2023-06-11 17:43:47,924 - __main__ - INFO -   Codeword error rate: 0.571429
+2023-06-11 17:43:47,924 - __main__ - INFO -     1 error codewords: 2
+2023-06-11 17:43:47,924 - __main__ - INFO -     Uncorrectable codewords: 2
+2023-06-11 17:43:47,924 - __main__ - INFO - Before correction:
+2023-06-11 17:43:47,924 - __main__ - INFO -   Number of correct bits: 370
+2023-06-11 17:43:47,924 - __main__ - INFO -   Number of incorrect bits: 6
+2023-06-11 17:43:47,924 - __main__ - INFO -   Bit error rate: 0.015957
+2023-06-11 17:43:47,925 - __main__ - INFO - After correction (trapping):
+2023-06-11 17:43:47,925 - __main__ - INFO -   Number of correct bits: 370
+2023-06-11 17:43:47,925 - __main__ - INFO -   Number of incorrect bits: 6
+2023-06-11 17:43:47,925 - __main__ - INFO -   Bit error rate: 0.015957
+2023-06-11 17:43:47,925 - __main__ - INFO - ***PNG***
+2023-06-11 17:43:48,090 - channel - INFO - Generated a (63, 57) cyclic code
+2023-06-11 17:43:48,090 - channel - INFO - 1 correctable errors
+2023-06-11 17:43:48,090 - channel - INFO - Generator matrix:
+[[1 1 0 ... 0 0 0]
+ [0 1 1 ... 0 0 0]
+ [0 0 1 ... 0 0 0]
+ ...
+ [1 0 0 ... 1 0 0]
+ [1 0 0 ... 0 1 0]
+ [1 0 0 ... 0 0 1]]
+2023-06-11 17:43:48,996 - __main__ - INFO - Channel statistic analysis:
+2023-06-11 17:43:48,996 - __main__ - INFO -   Total codewords: 460262
+2023-06-11 17:43:48,996 - __main__ - INFO -   Correct codewords: 244550
+2023-06-11 17:43:48,996 - __main__ - INFO -   Codeword error rate: 0.468672
+2023-06-11 17:43:48,996 - __main__ - INFO -     1 error codewords: 155456
+2023-06-11 17:43:48,996 - __main__ - INFO -     Uncorrectable codewords: 60256
+2023-06-11 17:43:49,516 - __main__ - INFO - Before correction:
+2023-06-11 17:43:49,516 - __main__ - INFO -   Number of correct bits: 25972562
+2023-06-11 17:43:49,516 - __main__ - INFO -   Number of incorrect bits: 262318
+2023-06-11 17:43:49,516 - __main__ - INFO -   Bit error rate: 0.009999
+2023-06-11 17:44:35,492 - __main__ - INFO - After correction (trapping):
+2023-06-11 17:44:35,492 - __main__ - INFO -   Number of correct bits: 26059326
+2023-06-11 17:44:35,492 - __main__ - INFO -   Number of incorrect bits: 175554
+2023-06-11 17:44:35,492 - __main__ - INFO -   Bit error rate: 0.006692
+2023-06-11 17:44:35,495 - __main__ - INFO - ***WAV***
+2023-06-11 17:44:35,660 - channel - INFO - Generated a (63, 57) cyclic code
+2023-06-11 17:44:35,660 - channel - INFO - 1 correctable errors
+2023-06-11 17:44:35,660 - channel - INFO - Generator matrix:
+[[1 1 0 ... 0 0 0]
+ [0 1 1 ... 0 0 0]
+ [0 0 1 ... 0 0 0]
+ ...
+ [1 0 0 ... 1 0 0]
+ [1 0 0 ... 0 1 0]
+ [1 0 0 ... 0 0 1]]
+2023-06-11 17:44:37,927 - __main__ - INFO - Channel statistic analysis:
+2023-06-11 17:44:37,927 - __main__ - INFO -   Total codewords: 150590
+2023-06-11 17:44:37,927 - __main__ - INFO -   Correct codewords: 79660
+2023-06-11 17:44:37,927 - __main__ - INFO -   Codeword error rate: 0.471014
+2023-06-11 17:44:37,927 - __main__ - INFO -     1 error codewords: 51106
+2023-06-11 17:44:37,927 - __main__ - INFO -     Uncorrectable codewords: 19824
+2023-06-11 17:44:40,774 - __main__ - INFO - Before correction:
+2023-06-11 17:44:40,774 - __main__ - INFO -   Number of correct bits: 8497317
+2023-06-11 17:44:40,774 - __main__ - INFO -   Number of incorrect bits: 86267
+2023-06-11 17:44:40,774 - __main__ - INFO -   Bit error rate: 0.010050
+2023-06-11 17:44:58,528 - __main__ - INFO - After correction (trapping):
+2023-06-11 17:44:58,528 - __main__ - INFO -   Number of correct bits: 8525880
+2023-06-11 17:44:58,528 - __main__ - INFO -   Number of incorrect bits: 57704
+2023-06-11 17:44:58,528 - __main__ - INFO -   Bit error rate: 0.006723
