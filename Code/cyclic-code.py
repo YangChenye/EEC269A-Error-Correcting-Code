@@ -10,15 +10,15 @@ from Utils import plot_wav, stat_analysis
 
 
 
-# Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code
+# Work with (3, 1) (7, 4) (15, 11) (31, 26) (63, 57) (127, 120) (255, 247) (511, 502) cyclic hamming code (t=1)
 # Syndrome look-up table corrector | trapping corrector
 # N, K = 127, 120
 # FLAG_SYNDROME = True
 # FLAG_TRAPPING = False
 
-# Work with (15, 5) cyclic code
-# Syndrome look-up table corrector
-N, K = 15, 5
+# Work with (15, 11, 1) (15, 7, 2) (15, 5, 3) (31, 26, 1) (31, 21, 2) (31, 16, 3) (31, 11, 5) (31, 6, 7) cyclic code
+# Trapping corrector
+N, K = 31, 6
 FLAG_SYNDROME = False
 FLAG_TRAPPING = True
 

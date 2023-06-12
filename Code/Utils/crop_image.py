@@ -5,13 +5,15 @@ import os
 
 # List of image paths
 image_paths = ["Result/Linear/linear-bsc-output.png",
-               "Result/Linear/linear-bsc-output-syndrome-corrected.png",
-               "Result/Cyclic/15-5/cyclic-bsc-output.png",
-               "Result/Cyclic/15-5/cyclic-bsc-output-trapping-corrected.png"]
+               "Result/Linear/linear-bsc-output-syndrome-corrected.png"]
 
 for (n, k) in [(3, 1), (7, 4), (15, 11), (31, 26), (63, 57), (127, 120)]:
     image_paths.append(f"Result/Cyclic/{n}-{k}/cyclic-bsc-output.png")
     image_paths.append(f"Result/Cyclic/{n}-{k}/cyclic-bsc-output-syndrome-corrected.png")
+    image_paths.append(f"Result/Cyclic/{n}-{k}/cyclic-bsc-output-trapping-corrected.png")
+
+for (n, k, t) in [(15, 11, 1), (15, 7, 2), (15, 5, 3), (31, 26, 1), (31, 21, 2), (31, 16, 3), (31, 11, 5), (31, 6, 7)]:
+    image_paths.append(f"Result/Cyclic/{n}-{k}/cyclic-bsc-output.png")
     image_paths.append(f"Result/Cyclic/{n}-{k}/cyclic-bsc-output-trapping-corrected.png")
 
 # The area to be cropped out of the images: (left, upper, right, lower)
