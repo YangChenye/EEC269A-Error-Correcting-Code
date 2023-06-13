@@ -905,23 +905,50 @@ If the weight of the syndrome is too high, then the decoder performs a cyclic sh
 
 If the decoder shifts through the whole codeword without finding a correctable syndrome, the codeword is deemed uncorrectable. For our case, we decided to simply ignore the error and pass the erroneous codeword to the output.
 
-\begin{flushleft}
+
 Here is an example:
 
-\quad Lets say for a given $(15,7)$ code with t=2, the received codeword is $110000100001101$. This has a resulting syndrome of $11101000$ which has a weight greater than 2. this means the error cannot be corrected. However, after a cyclic shift the codeword and syndrome become:
+Let's say for a given $(15,7)$ code with $t=2$, the received codeword is:
+\[
+    [1\ 1\ 0\ 0\ 0\ 0\ 1\ 0\ 0\ 0\ 0\ 1\ 1\ 0\ 1]
+\]
 
-$100001000011011 \rightarrow 00000001$
+This has a resulting syndrome of:
+\[
+    [1\ 1\ 1\ 0\ 1\ 0\ 0\ 0]
+\]
+which has a weight greater than 2, meaning that the error cannot be corrected. 
 
-This now a correctable pattern and the decoder repair the codeword as follows.
+However, after a cyclic shift, the codeword and syndrome become:
+\begin{equation*}
+    \begin{split}
+        &[1\ 0\ 0\ 0\ 0\ 1\ 0\ 0\ 0\ 0\ 1\ 1\ 0\ 1\ 1] \\
+        &\implies [0\ 0\ 0\ 0\ 0\ 0\ 0\ 1]
+    \end{split}
+\end{equation*}
 
-original: $110000100001101$
+This now a correctable pattern and the decoder repair the codeword as follows:
 
-shift 1 : $100001000011011$
+Original: 
+\[
+    [1\ 1\ 0\ 0\ 0\ 0\ 1\ 0\ 0\ 0\ 0\ 1\ 1\ 0\ 1]
+\]
 
-correct : $100001010011011$
+Shift 1: 
+\[
+    [1\ 0\ 0\ 0\ 0\ 1\ 0\ 0\ 0\ 0\ 1\ 1\ 0\ 1\ 1]
+\]
 
-shift -1: $110000101001101$
-\end{flushleft}
+Correct:
+\[
+    [1\ 0\ 0\ 0\ 0\ 1\ 0\ 1\ 0\ 0\ 1\ 1\ 0\ 1\ 1]
+\]
+
+Shift -1:
+\[
+    [1\ 1\ 0\ 0\ 0\ 0\ 1\ 0\ 1\ 0\ 0\ 1\ 1\ 0\ 1]
+\]
+
 
 \subsubsection{Results: TXT, PNG, WAV}
 
@@ -1194,9 +1221,7 @@ The primary difference between file formats such as PNG and JPEG, or WAV and MP3
 
 **PNG vs JPEG:**
 
-PNG (Portable Network Graphics) and JPEG (Joint Photographic Experts Group) are both commonly used formats for image files, but they use very different methods of compression. 
-
-PNG uses a lossless compression algorithm, meaning that when the image data is compressed and then decompressed, there is no loss of information. The image remains exactly the same as the original. This is especially beneficial when dealing with images that require high levels of detail or when dealing with graphics like logos and text. However, because PNG uses lossless compression, the file sizes tend to be larger.
+PNG uses a lossless compression algorithm, meaning that when the image data is compressed and then decompressed, there is no loss of information. The image remains exactly the same as the original.
 
 On the other hand, JPEG uses a lossy compression algorithm. This means that some data is lost when the image is compressed and then decompressed. JPEG's algorithm reduces file size by discarding some of the less important data or information that's less perceivable to the human eye. This results in smaller file sizes which is beneficial for web usage or storing many photos where high fidelity isn't the priority. However, the image quality decreases with the level of compression, potentially leading to noticeable artifacts or blurring.
 
