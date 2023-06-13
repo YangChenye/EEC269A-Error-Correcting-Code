@@ -113,9 +113,9 @@
     \hline
     \textbf{Function} & \textbf{Workload} & \textbf{Contributor} \\
     \hline
-    Source & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
+    Src \& Dest & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
     \hline
-    \multirow{2}{*}{Encoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & \multirow{2}{*}{Chenye} \\ 
+    \multirow{2}{*}{Encoder \& Decoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & \multirow{2}{*}{Chenye} \\ 
     & $(n,k)$ Systematic Cyclic Code & \\ 
     \hline
     Channel & Binary Symmetric Channel (BSC), adjustable error prob $p$ & Chenye \\ 
@@ -124,17 +124,14 @@
     & Syndrome Lookup Table for $(n,k)$ Cyclic Code, $t=1$ & Chenye \\ 
     & Error Trapping for $(n,k)$ Cyclic Code, adjustable $t$ & Pranav \\
     \hline
-    \multirow{2}{*}{Decoder} & $(7,4)$ Systematic Linear Block (Hamming) Code & \multirow{2}{*}{Chenye} \\ 
-    & $(n,k)$ Systematic Cyclic Code &  \\ 
-    \hline
-    Destination & Text string (TXT), Image (PNG), Audio (WAV) & Chenye \\ 
-    \hline
     \multirow{2}{*}{\textbf{Advanced features}} & \textbf{Create generator matrix for $(n,k)$ cyclic code} & \multirow{2}{*}{Pranav} \\ 
     & \textbf{Adjustable: $(n,k)$ and correctable errors $t$} &  \\
     \hline
+    \textbf{Data Analysis} & \textbf{Statistic Results} & Parisa, Chenye \\ 
+    \hline
     \textbf{Presentation} & Slides & Parisa \\ 
     \hline
-    \textbf{Report} & Written by contributors & - \\
+    \textbf{Report} & Work together & - \\
     \hline
     \end{tabulary}
 \end{table}
@@ -365,6 +362,8 @@ A BSC is characterized by two parameters: the input bit and the crossover probab
 
 Although the model is simple, the BSC is a building block for understanding more complex communication systems. By studying the BSC, researchers can develop algorithms and systems that minimize errors in binary data transmission, improving the reliability of digital communications.
 
+All the results are done with error probability $p = 0.01$, even though this $p$ is a configurable value in $[0, 1]$ by users.
+
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.3\textwidth]{bsc.png}
@@ -377,9 +376,6 @@ Although the model is simple, the BSC is a building block for understanding more
 
 
 
-
-
-\subsection{Additive White Gaussian Noise (AWGN) Channel}
 
 
 
@@ -412,6 +408,7 @@ The encoding process in a Hamming (7,4) code involves the multiplication of a 4-
         1 & 0 & 1 & 0 & 0 & 0 & 1 \\
         \end{bmatrix}.
 \end{equation*}
+
 If we denote the message vector as 
 \begin{equation*}
     u =
@@ -423,6 +420,7 @@ then the encoded codeword $v$ is computed by:
 \begin{equation*}
     v = u \cdot G .
 \end{equation*}
+
 This multiplication produces a 7-bit codeword, which is then ready for transmission.
 
 
@@ -430,19 +428,62 @@ This multiplication produces a 7-bit codeword, which is then ready for transmiss
 
 
 \subsection{Syndrome Decoder}
-For the Hamming (7, 4) Code, the parity check matrix H is a 3 by 7 matrix that is used to detect errors in received code words. In this context, the matrix is designed such that the product of H and any valid code word (expressed as a column vector) is a zero vector. This property is used to detect errors in received messages: if the product of H and the received vector is not zero, then the received vector is not a valid code word, and an error has occurred.
-The decoding process of the (7,4) Hamming code involves utilizing a syndrome lookup table. The syndrome, a binary vector, is computed from the received bits and is used to identify the error bit position. Each syndrome corresponds to a potential error location, and its lookup table is a key tool for efficient error correction.
+First, the parity-check matrix $H$ will be created from the generator matrix $G$ by transposing the 4 by 3 parity-check bits and filling it with an 3 by 3 identity matrix:
+\begin{equation*}
+H = 
+\begin{bmatrix}
+1 & 0 & 0 & 1 & 0 & 1 & 1 \\
+0 & 1 & 0 & 1 & 1 & 1 & 0 \\
+0 & 0 & 1 & 0 & 1 & 1 & 1 \\
+\end{bmatrix} .
+\end{equation*}
+
+The decoding process of the (7,4) Hamming code involves utilizing a syndrome lookup table, which is generated from the matrix multiplication:
+\begin{equation*}
+\text{syndrome table} = e \cdot H^T = \begin{bmatrix}
+0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+\end{bmatrix} \cdot H^T
+= \begin{bmatrix}
+    0 & 0 & 0 \\
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+    1 & 1 & 0 \\
+    0 & 1 & 1 \\
+    1 & 1 & 1 \\
+    1 & 0 & 1 \\
+\end{bmatrix} ,
+\end{equation*}
+where the 7 by 7 identity matrix with an extra row of zeros on the top, $e$, represents all the possible error patterns which are correctable by a syndrome look-up table for this specific (7,4) hamming code with generator matrix $G$. Each row of $e$ represents an error pattern identified by the same row of syndrome table. 
+
+When a codeword is received, the syndrome $s$ is computed from the received bits and is used to identify the error pattern:
+\begin{equation*}
+    s = r \cdot H^T ,
+\end{equation*}
+where the $r = [r_1\  r_2\  \dots\  r_7 ]$ represents the received codeword. 
+
+Each syndrome corresponds to a potential error pattern in the look-up table. The estimated transmitted codeword can be calculated by modulo 2 addiction of error pattern and received codeword:
+\begin{equation*}
+    \tilde{v} = r + e[i:] \mod 2 ,
+\end{equation*}
+where the $e[i:]$ represents the $i$-th row of error patterns $e$ when the calculated syndrome $s$ matches the $i$-th row of the syndrome table. 
+
+Since the code we are working on is systematic code, messages can be directly extracted from the last 4 bits of codewords. 
 
 
-
-
-
-\subsubsection{Results: text string}
-
+\subsubsection{Results: TXT, PNG, WAV}
+Shown in Table~\ref{tab:text-linear} Figure~\ref{fig:image-linear}~
 \begin{table}[htb]
     \centering
-    \caption{Text string encoded with Linear Hamming passed through BSC}
-    \label{tab:text-linear-bsc}
+    \caption{Text string encoded with (7, 4) linear Hamming code}
+    \label{tab:text-linear}
     \renewcommand{\arraystretch}{1.5}
     \begin{tabulary}{\textwidth}{ |L|L|L| } 
     \hline
@@ -454,35 +495,30 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
 \end{table}
 
 
-
-
-\subsubsection{Results: image}
-
-
 \begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Resource/image.png}
         \caption{Original}
-        \label{fig:image-linear-bsc-original}
+        \label{fig:image-linear-original}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-output.png}
         \caption{Without correction}
-        \label{fig:image-linear-bsc-no-correction}
+        \label{fig:image-linear-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
-        \label{fig:image-linear-bsc-syndrome-corrected}
+        \label{fig:image-linear-syndrome-corrected}
     \end{subfigure}
-       \caption{Image encoded with Linear Hamming passed through BSC (entire)}
-       \label{fig:image-linear-bsc}
+       \caption{Image encoded with (7, 4) linear Hamming code (entire)}
+       \label{fig:image-linear}
 \end{figure}
 
 
@@ -492,82 +528,53 @@ The decoding process of the (7,4) Hamming code involves utilizing a syndrome loo
         \centering
         \includegraphics[width=\textwidth]{../Resource/cropped-image.png}
         \caption{Original}
-        \label{fig:cropped-image-linear-bsc-original}
+        \label{fig:cropped-image-linear-original}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Linear/cropped-linear-bsc-output.png}
         \caption{Without correction}
-        \label{fig:cropped-image-linear-bsc-no-correction}
+        \label{fig:cropped-image-linear-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Linear/cropped-linear-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
-        \label{fig:cropped-image-linear-bsc-syndrome-corrected}
+        \label{fig:cropped-image-linear-syndrome-corrected}
     \end{subfigure}
-       \caption{Image encoded with Linear Hamming passed through BSC (details)}
-       \label{fig:cropped-image-linear-bsc}
+       \caption{Image encoded with (7, 4) linear Hamming code (details)}
+       \label{fig:cropped-image-linear}
 \end{figure}
-
-
-\subsubsection{Results: audio}
 
 
 \begin{figure}[htb]
     \centering
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Linear/wav-time-domain-TX.png}
-        \caption{Original}
-        \label{fig:t-audio-linear-bsc-original}
-    \end{subfigure}
+    % \begin{subfigure}[b]{\textwidth}
+    %     \centering
+    %     \includegraphics[width=\textwidth]{../Result/Linear/wav-time-domain-TX.png}
+    %     \caption{Original}
+    %     \label{fig:t-audio-linear-original}
+    % \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-time-domain-RX.png}
         \caption{Without correction}
-        \label{fig:t-audio-linear-bsc-no-correction}
+        \label{fig:t-audio-linear-no-correction}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-time-domain-RX-syndrome-corrected.png}
         \caption{Corrected}
-        \label{fig:t-audio-linear-bsc-syndrome-syndrome-corrected}
+        \label{fig:t-audio-linear-syndrome-corrected}
     \end{subfigure}
-       \caption{Audio encoded with Linear Hamming passed through BSC}
-       \label{fig:t-audio-linear-bsc}
+       \caption{Audio encoded with (7, 4) linear Hamming code}
+       \label{fig:t-audio-linear}
 \end{figure}
 
-
-\begin{figure}[htb]
-    \centering
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Linear/wav-frequency-domain-TX.png}
-        \caption{Original}
-        \label{fig:f-audio-linear-bsc-original}
-    \end{subfigure}
-    % \hfill
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-frequency-domain-RX.png}
-        \caption{Without correction}
-        \label{fig:f-audio-linear-bsc-no-correction}
-    \end{subfigure}
-    % \hfill
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Linear/linear-bsc-wav-frequency-domain-RX-syndrome-corrected.png}
-        \caption{Corrected}
-        \label{fig:f-audio-linear-bsc-syndrome-corrected}
-    \end{subfigure}
-       \caption{Audio encoded with Linear Hamming passed through BSC}
-       \label{fig:f-audio-linear-bsc}
-\end{figure}
 
 
 \section{$(n,k)$ Systematic Cyclic Code}
@@ -584,10 +591,92 @@ In the context of $(n,k)$ Systematic Cyclic Codes, the codes are designed such t
 
 \subsection{Adjustable $(n,k)$ for correcting $t$ errors}
 \label{sec:adjustable-nk}
-\textcolor{red}{TODO}
+Allowing for a customizable n and k required many complex steps but we will work from the base all the way up to the overall algorithm.
+\subsubsection{Polynomial Representation}
+The first step is to represent polynomials in an efficient manner. While the rest of the code uses a numpy array to represent everything, this section exclusively represents polynomials using integers, with each bit representing the coefficients. For example, the number 11 in binary is 0b1011. This means that the code will interpret 11 as the polynomial $x^3+x+1$.
+\subsubsection{Polynomial Division}
+Next we need to be able to divide polynomials. This was done with an algorithm similar to how you would divide by hand:
+\begin{enumerate}
+    \item Initialize the remainder to the dividend
+    \item Left shift divisor so that top bits align with remainder
+    \item Subtract the result of step 2 from the remainder.
+    \item Set the bit in the quotient according to the number of bits shifted
+    \item Repeat 2-4 until the remainder is less than the divisor.
+\end{enumerate}
+\subsubsection{Finding a Generator Polynomial}
+The search for a generator polynomial relies on two mathematical facts. Firstly, for any $(n, k)$ cyclic code, the generator polynomial $g(X)$ fits the equation $X^n+1 = g(X)*h(X)$. This means that the generator polynomial must evenly divide $X^n+1$.  Additionally, the generator polynomial must have order $n-k$. Using these two facts as constraints, we can brute force search through possible generators until  a viable candidate is found.
+\subsubsection{Building the Generator Matrix}
+Normally, a generator matrix for cyclic codes can be easily built using cyclic shifts. However, building it in a systematic form requires extra care. Any block code can be converted to systematic form using row operations. Below is an example of the generation of a $(7,4)$ code.
+
+\begin{flushleft}
+Initial:
+\[
+\begin{bmatrix}
+1 & 0 & 1 & 1 & 0 & 0 & 0 \\
+\end{bmatrix}
+\]
+
+Right shift:
+\[
+\begin{bmatrix}
+1 & 0 & 1 & 1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 1 & 1 & 0 & 0 \\
+\end{bmatrix}
+\]
+
+Correct systematic:
+\[
+\begin{bmatrix}
+1 & 0 & 1 & 1 & 0 & 0 & 0 \\
+1 & 1 & 1 & 0 & 1 & 0 & 0 \\
+\end{bmatrix}
+\]
+
+Right shift:
+\[
+\begin{bmatrix}
+1 & 0 & 1 & 1 & 0 & 0 & 0 \\
+1 & 1 & 1 & 0 & 1 & 0 & 0 \\
+0 & 1 & 1 & 1 & 0 & 1 & 0 \\
+\end{bmatrix}
+\]
+
+Correct systematic:
+\[
+\begin{bmatrix}
+1 & 0 & 1 & 1 & 0 & 0 & 0 \\
+1 & 1 & 1 & 0 & 1 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 & 0 \\
+\end{bmatrix}
+\]
+
+Right shift:
+\[
+\begin{bmatrix}
+1 & 0 & 1 & 1 & 0 & 0 & 0 \\
+1 & 1 & 1 & 0 & 1 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 & 0 \\
+0 & 1 & 1 & 0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\]
+
+Done
+\end{flushleft}
+
+\subsubsection{Checking the Correctable Errors}
+The number of correctable errors for a given code is based on the minimum distance between the codewords. The minimum distance of a code is equal to the minimum weight of all the codewords.
+Finding the minimum wait codeword can be difficult since there are $2^k$ codewords. However, since this is a systematic code, every codeword will at least have a weight equal to the information encoded in it. This means we can guide our search by iterating through minimum weight information words. It will also stop the search preemptively if the weight of the information words becomes larger than an already determined minimum. With a minimum distance of $d$, the number correctable errors is $(d-1)//2$ 
+\subsubsection{Overall Algorithm}
+\begin{enumerate}
+    \item Find a suitable generator polynomial given $n$ and $k$
+    \item Build the generator matrix
+    \item Check how many errors the code can correct
+    \item If this does not meet the target correctable errors, repeat.
+\end{enumerate}
+This algorithm can also be modified to search for all possible generators and find the best one.
 
 \subsection{Encoder}
-The encoding process in a $(n,k)$ Systematic Cyclic Code involves the multiplication of a $k$-bit message vector with a generator matrix. The generator matrix for a $(n,k)$ Cyclic Hamming Code, in its systematic form, is given as:
+The encoding process in a $(n,k)$ Systematic Cyclic Code involves the multiplication of a $k$-bit message vector with a generator matrix. The generator matrix for a $(n,k)$ Cyclic Code, in its systematic form, is given as:
 % \begin{equation*}
 %     G = 
 %     \begin{bmatrix}
@@ -610,7 +699,8 @@ The encoding process in a $(n,k)$ Systematic Cyclic Code involves the multiplica
     \end{bmatrix}
 \end{equation*}
 where $I_k$ represents a $k$ by $k$ identity matrix, and $P$ represents a $k$ by $(n-k)$ matrix for parity-check bits. 
-Following is an example of the generator matrix for a $(15,11)$ Cyclic Hamming Code, which is generated with procedures in Section~\ref{sec:adjustable-nk}:
+
+Following is an example of the generator matrix for a $(15,11)$ Cyclic Hamming Code ($t=1$), which is generated with procedures in Section~\ref{sec:adjustable-nk}:
 \begin{equation*}
     G = 
     \begin{bmatrix}
@@ -619,8 +709,9 @@ Following is an example of the generator matrix for a $(15,11)$ Cyclic Hamming C
         \vdots & \vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
         1 & 0 & 1 & 1 & 0 & 0 & \cdots & 1 & 0 \\
         1 & 0 & 0 & 1 & 0 & 0 & \cdots & 0 & 1 \\
-    \end{bmatrix}
+    \end{bmatrix} .
 \end{equation*}
+
 If we denote the message vector as 
 \begin{equation*}
     u =
@@ -632,18 +723,74 @@ then the encoded codeword $v$ is computed by:
 \begin{equation*}
     v = u \cdot G .
 \end{equation*}
+
 This multiplication produces a $n$-bit codeword, which is then ready for transmission.
 
 
 \subsection{Syndrome Decoder}
-When there are only 1-bit errors in the received codewords, the error bit can be corrected by using the syndrome lookup table.
+When there are only 1-bit errors in the received codewords, the error bit can be corrected by using the syndrome lookup table with the following general strategy. 
 
-\subsubsection{Text string}
+First, the parity-check matrix $H$ will be created from the generator matrix $G$ by transposing the $k$ by $(n-k)$ parity-check bits and filling it with an $(n-k)$ by $(n-k)$ identity matrix:
+\begin{equation*}
+    H = \begin{bmatrix}
+        I_{n-k} & P^T
+    \end{bmatrix} .
+\end{equation*}
+
+The decoding process of the $(n, k)$ cyclic code for $t=1$ error involves utilizing a syndrome lookup table, which is generated from the matrix multiplication:
+\begin{equation*}
+\text{syndrome table} = e \cdot H^T = \begin{bmatrix}
+0_{1\times n} \\
+I_n
+\end{bmatrix} \cdot H^T .
+\end{equation*}
+where the $n$ by $n$ identity matrix with an extra row of zeros on the top, $e$, represents all the possible error patterns which are correctable by a syndrome look-up table for this specific $(n, k)$ cyclic code with generator matrix $G$. Each row of $e$ represents an error pattern identified by the same row of syndrome table. 
+
+Following is an example of the parity-check matrix $H$ and syndrome look-up table for a (15, 11) Cyclic Hamming Code ($t=1$):
+\begin{equation*}
+H = 
+\begin{bmatrix}
+1 & 0 & 0 & 0 & 1 & 0 & \dots & 1 & 1 \\
+0 & 1 & 0 & 0 & 1 & 1 & \dots & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 & 1 & \dots & 1 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 & \dots & 1 & 1 \\
+\end{bmatrix} ,
+\end{equation*}
+\begin{equation}
+\text{syndrome table} = 
+\begin{bmatrix}
+0 & 0 & 0 & 0 \\
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+\vdots & \vdots & \vdots & \vdots \\
+1 & 0 & 1 & 1 \\
+1 & 0 & 0 & 1 \\
+\end{bmatrix} .
+\end{equation}
+
+
+
+When a codeword is received, the syndrome $s$ is computed from the received bits and is used to identify the error pattern:
+\begin{equation*}
+    s = r \cdot H^T ,
+\end{equation*}
+where the $r = [r_1\  r_2\  \dots\  r_n ]$ represents the received codeword. 
+
+Each syndrome corresponds to a potential error pattern in the look-up table. The estimated transmitted codeword can be calculated by modulo 2 addiction of error pattern and received codeword:
+\begin{equation*}
+    \tilde{v} = r + e[i:] \mod 2 ,
+\end{equation*}
+where the $e[i:]$ represents the $i$-th row of error patterns $e$ when the calculated syndrome $s$ matches the $i$-th row of the syndrome table. 
+
+Since the code we are working on is systematic code, messages can be directly extracted from the last $k$ bits of codewords. 
+
+
+\subsubsection{Results: TXT, PNG, WAV}
 
 \begin{table}[htb]
     \centering
-    \caption{Text string encoded with Cyclic Hamming passed through BSC}
-    \label{tab:text-cyclic-bsc}
+    \caption{Text string encoded with (15, 11) cyclic code with 1 correctable error (syndrome decoder)}
+    \label{tab:text-cyclic-15-11-syndrome}
     \renewcommand{\arraystretch}{1.5}
     \begin{tabulary}{\textwidth}{ |L|L|L| } 
     \hline
@@ -655,34 +802,30 @@ When there are only 1-bit errors in the received codewords, the error bit can be
 \end{table}
 
 
-
-\subsubsection{Image}
-
-
 \begin{figure}[htb]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Resource/image.png}
         \caption{Original}
-        \label{fig:image-cyclic-bsc-original}
+        \label{fig:image-cyclic-15-11-original}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-output.png}
         \caption{Without correction}
-        \label{fig:image-cyclic-bsc-no-correction}
+        \label{fig:image-cyclic-15-11-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
-        \label{fig:image-cyclic-bsc-syndrome-corrected}
+        \label{fig:image-cyclic-15-11-syndrome-corrected}
     \end{subfigure}
-       \caption{Image encoded with Cyclic Hamming passed through BSC (entire)}
-       \label{fig:image-cyclic-bsc}
+       \caption{Image encoded with (15, 11) cyclic code with 1 correctable error (syndrome decoder) (entire)}
+       \label{fig:image-cyclic-15-11-syndrome}
 \end{figure}
 
 
@@ -694,88 +837,57 @@ When there are only 1-bit errors in the received codewords, the error bit can be
         \centering
         \includegraphics[width=\textwidth]{../Resource/cropped-image.png}
         \caption{Original}
-        \label{fig:cropped-image-cyclic-bsc-original}
+        \label{fig:cropped-image-cyclic-15-11-original}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cropped-cyclic-bsc-output.png}
         \caption{Without correction}
-        \label{fig:cropped-image-cyclic-bsc-no-correction}
+        \label{fig:cropped-image-cyclic-15-11-no-correction}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cropped-cyclic-bsc-output-syndrome-corrected.png}
         \caption{Corrected}
-        \label{fig:cropped-image-cyclic-bsc-syndrome-corrected}
+        \label{fig:cropped-image-cyclic-15-11-syndrome-corrected}
     \end{subfigure}
-       \caption{Image encoded with Cyclic Hamming passed through BSC (details)}
-       \label{fig:cropped-image-cyclic-bsc}
+       \caption{Image encoded with (15, 11) cyclic code with 1 correctable error (syndrome decoder) (details)}
+       \label{fig:cropped-image-cyclic-15-11-syndrome}
 \end{figure}
 
 
 
 
-
-
-\subsubsection{Audio}
-
-
-
 \begin{figure}[htb]
     \centering
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/wav-time-domain-TX.png}
-        \caption{Original}
-        \label{fig:t-audio-cyclic-bsc-original}
-    \end{subfigure}
+    % \begin{subfigure}[b]{\textwidth}
+    %     \centering
+    %     \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/wav-time-domain-TX.png}
+    %     \caption{Original}
+    %     \label{fig:t-audio-cyclic-15-11-original}
+    % \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-time-domain-RX.png}
         \caption{Without correction}
-        \label{fig:t-audio-cyclic-bsc-no-correction}
+        \label{fig:t-audio-cyclic-15-11-no-correction}
     \end{subfigure}
     % \hfill
     \begin{subfigure}[b]{\textwidth}
         \centering
         \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-time-domain-RX-syndrome-corrected.png}
         \caption{Corrected}
-        \label{fig:t-audio-cyclic-bsc-syndrome-syndrome-corrected}
+        \label{fig:t-audio-cyclic-15-11-syndrome-corrected}
     \end{subfigure}
-       \caption{Audio encoded with Cyclic Hamming passed through BSC}
-       \label{fig:t-audio-cyclic-bsc}
+       \caption{Audio encoded with (15, 11) cyclic code with 1 correctable error (syndrome decoder)}
+       \label{fig:t-audio-cyclic-15-11-syndrome}
 \end{figure}
 
 
 
-\begin{figure}[htb]
-    \centering
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/wav-frequency-domain-TX.png}
-        \caption{Original}
-        \label{fig:f-audio-cyclic-bsc-original}
-    \end{subfigure}
-    % \hfill
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-frequency-domain-RX.png}
-        \caption{Without correction}
-        \label{fig:f-audio-cyclic-bsc-no-correction}
-    \end{subfigure}
-    % \hfill
-    \begin{subfigure}[b]{\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{../Result/Cyclic/15-11/cyclic-bsc-wav-frequency-domain-RX-syndrome-corrected.png}
-        \caption{Corrected}
-        \label{fig:f-audio-cyclic-bsc-syndrome-corrected}
-    \end{subfigure}
-       \caption{Audio encoded with Cyclic Hamming passed through BSC}
-       \label{fig:f-audio-cyclic-bsc}
-\end{figure}
 
 
 
@@ -783,36 +895,373 @@ When there are only 1-bit errors in the received codewords, the error bit can be
 
 
 \subsection{Error Trapping Decoder}
-\textcolor{red}{TODO}
+When there are 1-bit errors or more than one bit errors in the received codewords, the error bits can be corrected by error trapping decoder with the following general strategy.
+
+This decoder starts off the same as the syndrome LUT decoder. It uses the parity matrix to calculate the syndrome of the codeword. If the syndrome is zero, then the word has no errors and is passed to the output.
+
+That is where the similarities end. To correct any errors, the decoder uses the syndrome itself as the error pattern. If the syndrome has weight less than or equal to the amount of errors the code can correct, then the syndrome can be added to the top portion of the codeword to remove any errors.
+
+If the weight of the syndrome is too high, then the decoder performs a cyclic shift on the codeword and tries again. Eventually, the decoder will reach a correctable state. After fixing the error, the cyclic shifts are undone and it is passed to the output.
+
+If the decoder shifts through the whole codeword without finding a correctable syndrome, the codeword is deemed uncorrectable. For our case, we decided to simply ignore the error and pass the erroneous codeword to the output.
+
+\begin{flushleft}
+Here is an example:
+
+\quad Lets say for a given $(15,7)$ code with t=2, the received codeword is $110000100001101$. This has a resulting syndrome of $11101000$ which has a weight greater than 2. this means the error cannot be corrected. However, after a cyclic shift the codeword and syndrome become:
+
+$100001000011011 \rightarrow 00000001$
+
+This now a correctable pattern and the decoder repair the codeword as follows.
+
+original: $110000100001101$
+
+shift 1 : $100001000011011$
+
+correct : $100001010011011$
+
+shift -1: $110000101001101$
+\end{flushleft}
+
+\subsubsection{Results: TXT, PNG, WAV}
+
+\begin{table}[htb]
+    \centering
+    \caption{Text string encoded with (15, 5) cyclic code with 3 correctable error (error trapping decoder)}
+    \label{tab:text-cyclic-15-5-trapping}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabulary}{\textwidth}{ |L|L|L| } 
+    \hline
+    \textbf{Original} & \textbf{Without correction} & \textbf{Corrected} \\
+    \hline
+    Hello World! EEC269A Error Correcting Code Demo & Hello World! EEC26\textcolor{red}{\textsuperscript{A}} Error Co\textcolor{red}{`}recting C\textcolor{red}{"}de Dem\textcolor{red}{k} & Hello World!
+    EEC269A Error Correcting Code Demo \\
+    \hline
+\end{tabulary}
+\end{table}
 
 
-\newpage
-\section{Appendix: Python source code}
-\subsection{Source}
-\label{appendix:source}
-\lstinputlisting[language=Python]{../Code/source.py}
+% Results : CRC (15 ,5) - error trapping method for .png file
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Resource/image.png}
+        \caption{Original}
+        \label{fig:image-cyclic-15-5-original}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/cyclic-bsc-output.png}
+        \caption{Without correction}
+        \label{fig:image-cyclic-15-5-no-correction}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/cyclic-bsc-output-trapping-corrected.png}
+        \caption{Corrected}
+        \label{fig:image-cyclic-15-5-trapping-corrected}
+    \end{subfigure}
+       \caption{Image encoded with (15, 5) cyclic code with 3 correctable error (error trapping decoder) (details)}
+       \label{fig:image-cyclic-15-5-trapping}
+\end{figure}
 
-\subsection{Channel}
-\label{appendix:channel}
-\lstinputlisting[language=Python]{../Code/channel.py}
 
-\subsection{Destination}
-\label{appendix:destination}
-\lstinputlisting[language=Python]{../Code/destination.py}
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Resource/cropped-image.png}
+        \caption{Original}
+        \label{fig:cropped-image-cyclic-15-5-original}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/cropped-cyclic-bsc-output.png}
+        \caption{Without correction}
+        \label{fig:cropped-image-cyclic-15-5-no-correction}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/cropped-cyclic-bsc-output-trapping-corrected.png}
+        \caption{Corrected}
+        \label{fig:cropped-image-cyclic-15-5-trapping-corrected}
+    \end{subfigure}
+       \caption{Image encoded with (15, 5) cyclic code with 3 correctable error (error trapping decoder) (details)}
+       \label{fig:cropped-image-cyclic-15-5-trapping}
+\end{figure}
 
-\subsection{Utilities}
-\label{appendix:utils}
-\lstinputlisting[language=Python]{../Code/Utils/polyTools.py}
-\lstinputlisting[language=Python]{../Code/Utils/plot_wav.py}
-\lstinputlisting[language=Python]{../Code/Utils/stat_analysis.py}
 
-\subsection{Linear code}
-\label{appendix:linear-code}
-\lstinputlisting[language=Python]{../Code/linear-code.py}
+% Results : CRC (15 ,5) - error trapping method for .wav file
+\begin{figure}[htb]
+    \centering
+    % \begin{subfigure}[b]{\textwidth}
+    %     \centering
+    %     \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/wav-time-domain-TX.png}
+    %     \caption{Original}
+    %     \label{fig:t-audio-cyclic-15-5-original}
+    % \end{subfigure}
+    % \hfill
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/cyclic-bsc-wav-time-domain-RX.png}
+        \caption{Without correction}
+        \label{fig:t-audio-cyclic-15-5-no-correction}
+    \end{subfigure}
+    % \hfill
+    \begin{subfigure}[b]{\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../Result/Cyclic/15-5/cyclic-bsc-wav-time-domain-RX-trapping-corrected.png}
+        \caption{Corrected}
+        \label{fig:t-audio-cyclic-15-5-trapping-corrected}
+    \end{subfigure}
+       \caption{Audio encoded with (15, 5) cyclic code with 3 correctable error (error trapping decoder)}
+       \label{fig:t-audio-cyclic-15-5-trapping}
+\end{figure}
 
-\subsection{Cyclic code}
-\label{appendix:cyclic-code}
-\lstinputlisting[language=Python]{../Code/cyclic-code.py}
+ 
+% \newpage
+% \section{Appendix: Python source code}
+% \subsection{Source}
+% \label{appendix:source}
+% \lstinputlisting[language=Python]{../Code/source.py}
+
+% \subsection{Channel}
+% \label{appendix:channel}
+% \lstinputlisting[language=Python]{../Code/channel.py}
+
+% \subsection{Destination}
+% \label{appendix:destination}
+% \lstinputlisting[language=Python]{../Code/destination.py}
+
+% \subsection{Utilities}
+% \label{appendix:utils}
+% \lstinputlisting[language=Python]{../Code/Utils/polyTools.py}
+% \lstinputlisting[language=Python]{../Code/Utils/plot_wav.py}
+% \lstinputlisting[language=Python]{../Code/Utils/stat_analysis.py}
+
+% \subsection{Linear code}
+% \label{appendix:linear-code}
+% \lstinputlisting[language=Python]{../Code/linear-code.py}
+
+% \subsection{Cyclic code}
+% \label{appendix:cyclic-code}
+% \lstinputlisting[language=Python]{../Code/cyclic-code.py}
+
+\section{Statistics Analysis}
+
+In this section, we discuss the statistical results of all the 3 coding and decoding approaches that we had in this project. The results for (7, 4) Hamming code are brought in Table \ref{tab:stat-linear}. Accordingly, the bit error rate for all file types (including text, image, and audio file) is almost the same which is equal to the error probability of the binary symmetric channel (BSC with $p = 0.01$). The linear hamming code is capable of correcting up to 1 error per codeword. Consequently, the bit error rate is decreased to a certain amount after correction. However, some errors remain uncorrected. 
+
+We show the results for (15, 5) cyclic code with error trapping decoder and (15, 11) cyclic code with syndrome decoder in Table \ref{tab:stat-trapping-(15,5)} and Table \ref{tab:stat-syndrome-(15,11)}, respectively. These 2 approaches compete with each other in a trade-off between accuracy and transmission rate concepts. Hence, we decide to use the coding technique according to the problem requirements and there is no perfect coding that can satisfy the mentioned metrics at the maximum possible value simultaneously. The (15,11) Cyclic code can correct up to 1 error per codeword, while the (15,5) Cyclic code corrects up to 3 errors. However, the total codewords generated by the (15, 11) CRC is 35, and this value is equal to 75 codewords (more than twice) for the (15, 5) CRC. Consequently, we need more time or bandwidth to transfer the same file with the second technique. It is worth mentioning that the final bit error rates (after correction) of these 2 models are equal to 0.0000 for text files, which indicates that the (15, 11) outperforms the (15, 5) due to its lower bandwidth/time consumption. But for larger data types, like audio or image files, the after-correction error rate of  (15,11) is less than (15,5), which promises a more reliable communication.
+
+\begin{table}[htb]
+    \centering
+    \caption{Statistic results of (7,4) linear Hamming code}
+    \label{tab:stat-linear}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabulary}{\textwidth}{|L|L|L|L|}
+    \hline
+    \textbf{File Type} & \textbf{Metric} & \textbf{Before Correction} & \textbf{After Correction} \\
+    \hline
+    \multirow{8}{*}{TXT} & Total codewords & 94 & - \\
+     & Correct codewords & 88 & - \\
+     & Codeword error rate & 0.063830 & - \\
+     & \qquad 1 error codewords & 6 & - \\
+     & \qquad Uncorrectable codewords & 0 & - \\
+     & Number of correct bits & 372 & 376 \\
+     & Number of incorrect bits & 4 & 0 \\
+     & Bit error rate & 0.010638 & 0.000000 \\
+    \hline
+    \multirow{8}{*}{PNG} & Total codewords & 6558720 & - \\
+     & Correct codewords & 6113686 & - \\
+     & Codeword error rate & 0.067854 & - \\
+     & \qquad 1 error codewords & 431981 & - \\
+     & \qquad Uncorrectable codewords & 13053 & - \\
+     & Number of correct bits & 25973102 & 26212419 \\
+     & Number of incorrect bits & 261778 & 22461 \\
+     & Bit error rate & 0.009978 & 0.000856 \\
+    \hline
+    \multirow{8}{*}{WAV} & Total codewords & 2145896 & - \\
+     & Correct codewords & 2000385 & - \\
+     & Codeword error rate & 0.067809 & - \\
+     & \qquad 1 error codewords & 141137 & - \\
+     & \qquad Uncorrectable codewords & 4374 & - \\
+     & Number of correct bits & 8497569 & 8576040 \\
+     & Number of incorrect bits & 86015 & 7544 \\
+     & Bit error rate & 0.010021 & 0.000879 \\
+    \hline
+    \end{tabulary}
+\end{table}
+
+
+\begin{table}[htb]
+    \centering
+    \caption{Statistic results of (15, 11) cyclic code with 1 correctable error (syndrome decoder)}
+    \label{tab:stat-syndrome-(15,11)}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabulary}{\textwidth}{|L|L|L|L|}
+    \hline
+    \textbf{File Type} & \textbf{Metric} & \textbf{Before Correction} & \textbf{After Correction} \\
+    \hline
+    \multirow{8}{*}{TXT} & Total codewords & 35 & - \\
+     & Correct codewords & 29 & - \\
+     & Codeword error rate & 0.171429 & - \\
+     & \qquad 1 error codewords & 6 & - \\
+     & \qquad Uncorrectable codewords & 0 & - \\
+     & Number of correct bits & 372 & 376 \\
+     & Number of incorrect bits & 4 & 0 \\
+     & Bit error rate & 0.010638 & 0.000000 \\
+    \hline
+    \multirow{8}{*}{PNG} & Total codewords & 2384990 & - \\
+     & Correct codewords & 2051296 & - \\
+     & Codeword error rate & 0.139914 & - \\
+     & \qquad 1 error codewords & 310904 & - \\
+     & \qquad Uncorrectable codewords & 22790 & - \\
+     & Number of correct bits & 25972541 & 26184088 \\
+     & Number of incorrect bits & 262339 & 50792 \\
+     & Bit error rate & 0.010000 & 0.001936 \\
+    \hline
+    \multirow{8}{*}{WAV} & Total codewords & 780326 & - \\
+     & Correct codewords & 671482 & - \\
+     & Codeword error rate & 0.139485 & - \\
+     & \qquad 1 error codewords & 101430 & - \\
+     & \qquad Uncorrectable codewords & 7414 & - \\
+     & Number of correct bits & 8497796 & 8567137 \\
+     & Number of incorrect bits & 85788 & 16447 \\
+     & Bit error rate & 0.009994 & 0.001916 \\
+    \hline
+    \end{tabulary}
+\end{table}
+
+
+
+\begin{table}[htb]
+    \centering
+    \caption{Statistic results of (15, 5) cyclic code with 3 correctable error (error trapping decoder)}
+    \label{tab:stat-trapping-(15,5)}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabulary}{\textwidth}{|L|L|L|L|}
+    \hline
+    \textbf{File Type} & \textbf{Metric} & \textbf{Before Correction} & \textbf{After Correction} \\
+    \hline
+    \multirow{10}{*}{TXT} & Total codewords & 76 & - \\
+     & Correct codewords & 64 & - \\
+     & Codeword error rate & 0.157895 & - \\
+     & \qquad 1 error codewords & 11 & - \\
+     & \qquad 2 error codewords & 1 & - \\
+     & \qquad 3 error codewords & 0 & - \\
+     & \qquad Uncorrectable codewords & 0 & - \\
+     & Number of correct bits & 372 & 376 \\
+     & Number of incorrect bits & 4 & 0 \\
+     & Bit error rate & 0.010638 & 0.000000 \\
+    \hline
+    \multirow{10}{*}{PNG} & Total codewords & 5246976 & - \\
+     & Correct codewords & 4514112 & - \\
+     & Codeword error rate & 0.139674 & - \\
+     & \qquad 1 error codewords & 682449 & - \\
+     & \qquad 2 error codewords & 48298 & - \\
+     & \qquad 3 error codewords & 2051 & - \\
+     & \qquad Uncorrectable codewords & 66 & - \\
+     & Number of correct bits & 25972642 & 26234721 \\
+     & Number of incorrect bits & 262238 & 159 \\
+     & Bit error rate & 0.009996 & 0.000006 \\
+    \hline
+    \multirow{10}{*}{WAV} & Total codewords & 1716717 & - \\
+     & Correct codewords & 1476183 & - \\
+     & Codeword error rate & 0.140113 & - \\
+     & \qquad 1 error codewords & 223879 & - \\
+     & \qquad 2 error codewords & 15896 & - \\
+     & \qquad 3 error codewords & 731 & - \\
+     & \qquad Uncorrectable codewords & 28 & - \\
+     & Number of correct bits & 8497463 & 8583525 \\
+     & Number of incorrect bits & 86121 & 59 \\
+     & Bit error rate & 0.010033 & 0.000007 \\
+    \hline
+    \end{tabulary}
+\end{table}
+
+
+
+
+
+\section{Other Challenges}
+\subsection{Why PNG and WAV}
+The primary difference between file formats such as PNG and JPEG, or WAV and MP3, is the way the data is compressed. More specifically, the difference is in whether the compression is lossless or lossy.
+
+**PNG vs JPEG:**
+
+PNG (Portable Network Graphics) and JPEG (Joint Photographic Experts Group) are both commonly used formats for image files, but they use very different methods of compression. 
+
+PNG uses a lossless compression algorithm, meaning that when the image data is compressed and then decompressed, there is no loss of information. The image remains exactly the same as the original. This is especially beneficial when dealing with images that require high levels of detail or when dealing with graphics like logos and text. However, because PNG uses lossless compression, the file sizes tend to be larger.
+
+On the other hand, JPEG uses a lossy compression algorithm. This means that some data is lost when the image is compressed and then decompressed. JPEG's algorithm reduces file size by discarding some of the less important data or information that's less perceivable to the human eye. This results in smaller file sizes which is beneficial for web usage or storing many photos where high fidelity isn't the priority. However, the image quality decreases with the level of compression, potentially leading to noticeable artifacts or blurring.
+
+**WAV vs MP3:**
+
+Similarly, WAV (Waveform Audio File Format) and MP3 (MPEG-1 Audio Layer III) are both audio file formats that differ in their compression methods.
+
+WAV files are a raw audio format created by Microsoft and IBM. They are lossless, uncompressed, and retain full quality of the audio data. This results in high-quality audio but also significantly larger file sizes. It's commonly used in professional settings where high audio quality is a must, like music production or broadcasting.
+
+MP3, however, uses a form of lossy data compression to encode data using inexact approximations, significantly reducing the file size. It was designed to greatly reduce the amount of data required to represent audio, yet still sound like a faithful reproduction of the original uncompressed audio to most listeners. This has made it a common format for consumer audio streaming and storage, but the lossy nature means that some audio fidelity is sacrificed for smaller file size.
+
+In summary, the choice between these formats depends on your needs. If retaining the original quality of the image or sound is of utmost importance, then lossless formats like PNG and WAV are the way to go. However, if you need to save storage space or bandwidth and can afford some loss in quality, then lossy formats like JPEG and MP3 would be more suitable.
+
+
+
+\subsection{Why only extract DATA chunk}
+When we talk about chunks in the context of PNG and WAV files, we're referring to sections of data within these files that have different purposes. In both file types, each chunk begins with a header that identifies its type and carries other relevant information such as the chunk's size. The way these chunks are handled contributes significantly to how these file types work. But what happens if these chunks get messed up? Let's take a closer look.
+
+**PNG:**
+
+In a PNG file, the chunks store different types of data such as the image's metadata, palette data, and actual image data (in the IDAT chunk), among other things. 
+
+If a chunk other than the IDAT chunk is messed up or corrupted, the PNG viewer or editor will still attempt to display the image data. However, depending on the severity and location of the corruption, different issues may arise. 
+
+For example, if the IHDR chunk (header chunk containing crucial details like width, height, bit depth, etc.) is corrupted, the image may not display correctly or at all, because these fundamental details are required to interpret the image data correctly. A corrupted PLTE chunk (palette data) might result in wrong colors being displayed. 
+
+If ancillary chunks like tEXt (textual information), pHYs (physical pixel dimensions), or tIME (last modification time) are corrupted, it's less severe since these chunks do not directly affect the display of the image, but it may cause incorrect metadata to be displayed or used.
+
+**WAV:**
+
+In a WAV file, data is also organized into chunks. The two primary chunks are the 'fmt ' chunk, containing format information like sample rate, bit depth, and number of channels, and the 'data' chunk, which contains the actual audio data.
+
+Corruption or misinterpretation of the 'fmt ' chunk can result in the audio file being unplayable because the player wouldn't know how to correctly interpret the raw audio data. The audio could also be played back at the wrong speed, or with incorrect bit depth or number of channels, causing significant distortions or alterations to the sound.
+
+Other optional chunks in a WAV file, such as 'LIST' (metadata), 'fact' (additional format information), or 'cue ' (cue points), might not prevent the audio from being played if they get messed up, but they could lead to loss of additional information or features associated with the audio file.
+
+In both cases, it's essential to note that how severely the corruption of a chunk impacts the file can also depend on the software used to view or play the file, as different software may have different ways of handling such errors.
+
+
+\subsection{Speed up program}
+Loops in programming languages like Python can be slow, especially when iterating through large matrices. There are several ways we can speed up a for loop when performing matrix operations:
+
+\begin{enumerate}
+\item \textbf{Use NumPy library:} NumPy is a library in Python specifically designed to handle numerical computations much faster than Python's built-in methods, mainly when dealing with matrices or arrays. NumPy performs operations in compiled C code under the hood, making it much more efficient. Suppose you have a matrix A and you want to add a vector v to each row. In a for loop, you might write:
+\begin{verbatim}
+for i in range(A.shape[0]):
+    A[i, :] += v
+\end{verbatim}
+But with NumPy, you can write:
+\begin{verbatim}
+A += v
+\end{verbatim}
+This will perform the addition in a vectorized manner, which is much faster than using a for loop.
+
+\item \textbf{Use Broadcasting:} Broadcasting is a powerful mechanism that allows NumPy to work with arrays of different shapes when performing arithmetic operations. You can often use broadcasting to eliminate the need for loops entirely.
+
+\item \textbf{Use Vectorized Operations:} Instead of using loops, you can often rephrase your problem in a way that allows you to use vectorized operations. These are operations that are performed on whole arrays at once, which can be much faster than looping through individual elements.
+
+\item \textbf{Parallelize your code:} If your loop iterations are independent (i.e., the result of one iteration doesn't depend on the result of any other), you might be able to speed up your code significantly by running multiple iterations in parallel. Libraries like \textit{joblib} and \textit{multiprocessing} can help with this in Python.
+
+\end{enumerate}
+
+
+
+
 
 
 \end{document}
