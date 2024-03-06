@@ -6,7 +6,7 @@ kiwisolver==1.4.4
 matplotlib==3.7.1
 numpy==1.24.3
 packaging==23.1
-Pillow==10.1.0
+Pillow
 pycparser==2.21
 pyparsing==3.0.9
 python-dateutil==2.8.2
